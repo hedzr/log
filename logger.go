@@ -1,7 +1,8 @@
-// log provide the standard interface of logging for what any go libraries want strip off the direct dependency to a known logging library.
-
 // Copyright © 2020 Hedzr Yeh.
 
+// package log provide the standard interface of logging for what any go
+// libraries want strip off the direct dependency from a known logging
+// library.
 package log
 
 type (
