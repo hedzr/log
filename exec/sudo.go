@@ -90,11 +90,11 @@ func RunCommand(command string, readStdout bool, arguments ...string) (int, stri
 		slurp, _ := ioutil.ReadAll(stderr)
 		if ok {
 			// Command didn't exit with a zero exit status.
-			return exitStatus, output, fmt.Errorf("%q failed: %w |\n  stderr: %s", command, err, slurp)
+			return exitStatus, output, fmt.Errorf("%q failed: %v |\n  stderr: %s", command, err.Error(), slurp)
 		}
 
 		// An error occurred and there is no exit status.
-		return 0, output, fmt.Errorf("%q failed: %w |\n  stderr: %s", command, err, slurp)
+		return 0, output, fmt.Errorf("%q failed: %v |\n  stderr: %s", command, err.Error(), slurp)
 	}
 
 	return 0, output, nil
