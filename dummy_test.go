@@ -14,4 +14,17 @@ func TestNewLoggerConfig(t *testing.T) {
 	log.SetLevel(InfoLevel)
 	_ = log.GetLevel()
 	log.Setup()
+
+	log = NewStdLogger()
+	log.SetLevel(TraceLevel)
+	log.Tracef("")
+	log.Debugf("")
+	log.Infof("")
+	log.Warnf("")
+	log.Errorf("")
+	// log.Fatalf("")
+	log.Printf("")
+	log.SetLevel(InfoLevel)
+	_ = log.GetLevel()
+	log.Setup()
 }

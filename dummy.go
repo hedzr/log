@@ -2,12 +2,19 @@
 
 package log
 
-type dummyLogger struct{}
+import "log"
 
 // NewDummyLogger return a dummy logger
 func NewDummyLogger() Logger {
 	return &dummyLogger{}
 }
+
+// NewStdLogger return a stdlib `log` logger
+func NewStdLogger() Logger {
+	return &stdLogger{Level: InfoLevel}
+}
+
+type dummyLogger struct{}
 
 func (d *dummyLogger) Tracef(msg string, args ...interface{}) {
 	//panic("implement me")
@@ -48,4 +55,53 @@ func (d *dummyLogger) GetLevel() Level {
 
 func (d *dummyLogger) Setup() {
 	//panic("implement me")
+}
+
+type stdLogger struct {
+	Level
+}
+
+func (s *stdLogger) Tracef(msg string, args ...interface{}) {
+	if s.Level >= TraceLevel {
+		log.Printf(msg, args...)
+	}
+}
+
+func (s *stdLogger) Debugf(msg string, args ...interface{}) {
+	if s.Level >= DebugLevel {
+		log.Printf(msg, args...)
+	}
+}
+
+func (s *stdLogger) Infof(msg string, args ...interface{}) {
+	if s.Level >= InfoLevel {
+		log.Printf(msg, args...)
+	}
+}
+
+func (s *stdLogger) Warnf(msg string, args ...interface{}) {
+	log.Printf(msg, args...)
+}
+
+func (s *stdLogger) Errorf(msg string, args ...interface{}) {
+	log.Printf(msg, args...)
+}
+
+func (s *stdLogger) Fatalf(msg string, args ...interface{}) {
+	log.Fatalf(msg, args...)
+}
+
+func (s *stdLogger) Printf(msg string, args ...interface{}) {
+	log.Printf(msg, args...)
+}
+
+func (s *stdLogger) SetLevel(lvl Level) {
+	s.Level = lvl
+}
+
+func (s *stdLogger) GetLevel() Level {
+	return s.Level
+}
+
+func (s *stdLogger) Setup() {
 }
