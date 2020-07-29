@@ -72,8 +72,8 @@ func NewLoggerConfig() *LoggerConfig {
 		Format:    "text",
 		Target:    "console",
 		Directory: "/var/log",
-		DebugMode: false,
-		TraceMode: false,
+		DebugMode: GetDebugMode(),
+		TraceMode: GetTraceMode(),
 
 		MaxSize:    1024, // megabytes
 		MaxBackups: 3,    // 3 backups kept at most
