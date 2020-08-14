@@ -105,3 +105,50 @@ func (s *stdLogger) GetLevel() Level {
 
 func (s *stdLogger) Setup() {
 }
+
+//
+//
+//
+
+var level = WarnLevel
+
+func SetLevel(l Level) { level = l }
+func GetLevel() Level  { return level }
+
+func Tracef(msg string, args ...interface{}) {
+	if level >= TraceLevel {
+		log.Printf(msg, args...)
+	}
+}
+
+func Debugf(msg string, args ...interface{}) {
+	if level >= DebugLevel {
+		log.Printf(msg, args...)
+	}
+}
+
+func Infof(msg string, args ...interface{}) {
+	if level >= InfoLevel {
+		log.Printf(msg, args...)
+	}
+}
+
+func Warnf(msg string, args ...interface{}) {
+	log.Printf(msg, args...)
+}
+
+func Errorf(msg string, args ...interface{}) {
+	log.Printf(msg, args...)
+}
+
+func Fatalf(msg string, args ...interface{}) {
+	log.Fatalf(msg, args...)
+}
+
+func Panicf(msg string, args ...interface{}) {
+	log.Panicf(msg, args...)
+}
+
+func Printf(msg string, args ...interface{}) {
+	log.Printf(msg, args...)
+}
