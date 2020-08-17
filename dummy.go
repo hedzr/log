@@ -2,7 +2,10 @@
 
 package log
 
-import "log"
+import (
+	"fmt"
+	"log"
+)
 
 // NewDummyLogger return a dummy logger
 func NewDummyLogger() Logger {
@@ -38,6 +41,10 @@ func (d *dummyLogger) Errorf(msg string, args ...interface{}) {
 
 func (d *dummyLogger) Fatalf(msg string, args ...interface{}) {
 	//panic("implement me")
+}
+
+func (d *dummyLogger) Panicf(msg string, args ...interface{}) {
+	panic(fmt.Sprintf(msg, args...))
 }
 
 func (d *dummyLogger) Printf(msg string, args ...interface{}) {
@@ -91,6 +98,10 @@ func (s *stdLogger) Fatalf(msg string, args ...interface{}) {
 	log.Fatalf(msg, args...)
 }
 
+func (s *stdLogger) Panicf(msg string, args ...interface{}) {
+	log.Panicf(msg, args...)
+}
+
 func (s *stdLogger) Printf(msg string, args ...interface{}) {
 	log.Printf(msg, args...)
 }
@@ -109,46 +120,3 @@ func (s *stdLogger) Setup() {
 //
 //
 //
-
-var level = WarnLevel
-
-func SetLevel(l Level) { level = l }
-func GetLevel() Level  { return level }
-
-func Tracef(msg string, args ...interface{}) {
-	if level >= TraceLevel {
-		log.Printf(msg, args...)
-	}
-}
-
-func Debugf(msg string, args ...interface{}) {
-	if level >= DebugLevel {
-		log.Printf(msg, args...)
-	}
-}
-
-func Infof(msg string, args ...interface{}) {
-	if level >= InfoLevel {
-		log.Printf(msg, args...)
-	}
-}
-
-func Warnf(msg string, args ...interface{}) {
-	log.Printf(msg, args...)
-}
-
-func Errorf(msg string, args ...interface{}) {
-	log.Printf(msg, args...)
-}
-
-func Fatalf(msg string, args ...interface{}) {
-	log.Fatalf(msg, args...)
-}
-
-func Panicf(msg string, args ...interface{}) {
-	log.Panicf(msg, args...)
-}
-
-func Printf(msg string, args ...interface{}) {
-	log.Printf(msg, args...)
-}

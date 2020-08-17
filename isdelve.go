@@ -40,10 +40,19 @@ type Env struct {
 	traceMode bool
 }
 
-func (e *Env) InDebugging() bool   { return isdelve.Enabled }
-func (e *Env) GetDebugMode() bool  { return e.debugMode || isdelve.Enabled }
-func (e *Env) GetTraceMode() bool  { return e.traceMode || trace.IsEnabled() }
+// InDebugging check if the delve debugger presents
+func (e *Env) InDebugging() bool { return isdelve.Enabled }
+
+// GetDebugMode return the debug boolean flag generally
+func (e *Env) GetDebugMode() bool { return e.debugMode || isdelve.Enabled }
+
+// GetTraceMode return the trace boolean flag generally
+func (e *Env) GetTraceMode() bool { return e.traceMode || trace.IsEnabled() }
+
+// SetDebugMode set the debug boolean flag generally
 func (e *Env) SetDebugMode(b bool) { e.debugMode = b }
+
+// SetTraceMode set the trace boolean flag generally
 func (e *Env) SetTraceMode(b bool) { e.traceMode = b }
 
 var env = &Env{}
