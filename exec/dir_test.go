@@ -39,7 +39,7 @@ func TestIsDirectory(t *testing.T) {
 func TestForDir(t *testing.T) {
 	// defer logex.CaptureLog(t).Release()
 
-	err := exec.ForDir("$HOME/.local", func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
+	err := exec.ForDir("$HOME/.config", func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
 		if fi.IsDir() {
 			t.Logf("  - dir: %v/[%v]", cwd, fi.Name())
 		} else {
@@ -56,7 +56,7 @@ func TestForDir(t *testing.T) {
 func TestForDirMax(t *testing.T) {
 	// defer logex.CaptureLog(t).Release()
 
-	err := exec.ForDirMax("$HOME/.local", 0, 2, func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
+	err := exec.ForDirMax("$HOME/.config", 0, 2, func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
 		if fi.IsDir() {
 			t.Logf("  - dir: %v/[%v]", cwd, fi.Name())
 		} else {
