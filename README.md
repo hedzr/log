@@ -125,7 +125,7 @@ func a(){
 in `exec/dir.go`,
 
 ```go
-import "github.com/hedzr/log"
+import "github.com/hedzr/log/exec"
 
 func a(){
   print(exec.IsDiretory(exec.GetCurrentDir()))
@@ -160,6 +160,8 @@ _ = exec.ForDirMax(dir, 0, 1, func(depth int, cwd string, fi os.FileInfo) (stop 
 #### Exec Helpers
 
 ```go
+import "github.com/hedzr/log/exec"
+
 exec.Run()
 exec.Sudo()
 exec.RunWithOutput()
@@ -173,6 +175,7 @@ exec.IsEAccess()
 #### Trace Helpers
 
 ```go
+import "github.com/hedzr/log/trace"
 
 trace.RegisterOnTraceModeChanges(handler)
 trace.IsEnable()
