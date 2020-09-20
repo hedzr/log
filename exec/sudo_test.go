@@ -31,7 +31,7 @@ func TestRunCommand(t *testing.T) {
 }
 
 func TestCombineOutputs(t *testing.T) {
-	cmd := exec.Command("ls", "-lah", "/not-exits")
+	cmd := exec.Command("ls", "-lah")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("cmd.Run() failed with %s\n%s", err, out)
