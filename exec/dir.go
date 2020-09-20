@@ -4,6 +4,8 @@ package exec
 
 import (
 	"errors"
+	"github.com/hedzr/log"
+	"io/ioutil"
 	"os"
 	"os/user"
 	"path"
@@ -154,4 +156,78 @@ func normalizeDir(s string) string {
 	} else {
 		return s
 	}
+}
+
+// ForDir walks on `root` directory and its children
+func ForDir(root string, cb func(depth int, cwd string, fi os.FileInfo) (stop bool, err error)) (err error) {
+	err = ForDirMax(root, 0, -1, cb)
+	return
+}
+
+// ForDirMax walks on `root` directory and its children with nested levels up to `maxLength`.
+//
+// Example - discover folder just one level
+//
+//      _ = ForDirMax(dir, 0, 1, func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
+//			if fi.IsDir() {
+//				return
+//			}
+//          // ... doing something for a file,
+//			return
+//		})
+//		
+func ForDirMax(root string, initialDepth, maxDepth int, cb func(depth int, cwd string, fi os.FileInfo) (stop bool, err error)) (err error) {
+	if maxDepth > 0 && initialDepth >= maxDepth {
+		return
+	}
+
+	var files []os.FileInfo
+	files, err = ioutil.ReadDir(os.ExpandEnv(root))
+	if err != nil {
+		// Logger.Fatalf("error in ForDirMax(): %v", err)
+		return
+	}
+
+	var stop bool
+	for _, f := range files {
+		//Logger.Printf("  - %v", f.Name())
+		if stop, err = cb(initialDepth, root, f); stop {
+			return
+		}
+		if err != nil {
+			log.NewStdLogger().Errorf("error in ForDirMax().cb: %v", err)
+		} else if f.IsDir() && (maxDepth <= 0 || (maxDepth > 0 && initialDepth+1 < maxDepth)) {
+			dir := path.Join(root, f.Name())
+			if err = ForDirMax(dir, initialDepth+1, maxDepth, cb); err != nil {
+				log.NewStdLogger().Errorf("error in ForDirMax(): %v", err)
+			}
+		}
+	}
+
+	return
+}
+
+// IsExecOwner give the result of whether a file can be invoked by its unix-owner
+func IsExecOwner(mode os.FileMode) bool {
+	return mode&0100 != 0
+}
+
+// IsExecOwner give the result of whether a file can be invoked by its unix-group
+func IsExecGroup(mode os.FileMode) bool {
+	return mode&0010 != 0
+}
+
+// IsExecOwner give the result of whether a file can be invoked by its unix-all
+func IsExecOther(mode os.FileMode) bool {
+	return mode&0001 != 0
+}
+
+// IsExecOwner give the result of whether a file can be invoked by anyone
+func IsExecAny(mode os.FileMode) bool {
+	return mode&0111 != 0
+}
+
+// IsExecOwner give the result of whether a file can be invoked by all users
+func IsExecAll(mode os.FileMode) bool {
+	return mode&0111 == 0111
 }
