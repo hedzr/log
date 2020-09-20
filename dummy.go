@@ -17,6 +17,11 @@ func NewStdLogger() Logger {
 	return &stdLogger{Level: InfoLevel}
 }
 
+// NewStdLoggerWith return a stdlib `log` logger
+func NewStdLoggerWith(lvl Level) Logger {
+	return &stdLogger{Level: lvl}
+}
+
 type dummyLogger struct{}
 
 func (d *dummyLogger) Tracef(msg string, args ...interface{}) {
