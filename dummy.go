@@ -100,7 +100,8 @@ func (s *stdLogger) Errorf(msg string, args ...interface{}) {
 }
 
 func (s *stdLogger) Fatalf(msg string, args ...interface{}) {
-	log.Fatalf(msg, args...)
+	//log.Fatalf(msg, args...)
+	log.Panicf(msg, args...)
 }
 
 func (s *stdLogger) Panicf(msg string, args ...interface{}) {

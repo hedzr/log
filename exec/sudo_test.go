@@ -11,6 +11,11 @@ import (
 	"testing"
 )
 
+func TestRun(t *testing.T) {
+	_ = Run("ls", "-a")
+	_, _, _ = Sudo("ls", "-a")
+}
+
 func TestRunWithOutput(t *testing.T) {
 	_, out, err := RunWithOutput("ls", "-la", "/not-exits")
 	t.Logf("stdout: %v", out)

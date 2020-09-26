@@ -84,7 +84,42 @@ func TestGetExecutableDir(t *testing.T) {
 		t.Fatal("expecting regular file existed.")
 	}
 
-	dn := path.Join(exec.GetCurrentDir(), ".github")
+	fileInfo, err := os.Stat(fn)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	exec.IsExecOwner(fileInfo.Mode())
+	exec.IsExecGroup(fileInfo.Mode())
+	exec.IsExecOther(fileInfo.Mode())
+	exec.IsExecAny(fileInfo.Mode())
+	exec.IsExecAll(fileInfo.Mode())
+}
+
+func TestEnsureDir(t *testing.T) {
+	//
+
+	if err := exec.EnsureDir(""); err == nil {
+		t.Fatal("expecting an error.")
+	}
+
+	if err := exec.EnsureDirEnh(""); err == nil {
+		t.Fatal("expecting an error.")
+	}
+
+	//
+
+	dn := path.Join(exec.GetCurrentDir(), ".tmp.1")
+	if err := exec.EnsureDir(dn); err != nil {
+		t.Fatal(err)
+	}
+	if err := exec.RemoveDirRecursive(dn); err != nil {
+		t.Fatal(err)
+	}
+
+	//
+
+	dn = path.Join(exec.GetCurrentDir(), ".github")
 	if err := exec.EnsureDir(dn); err != nil {
 		t.Fatal(err)
 	}
@@ -107,4 +142,14 @@ func TestGetExecutableDir(t *testing.T) {
 	if err := exec.RemoveDirRecursive(dn); err != nil {
 		t.Fatal(err)
 	}
+}
+
+func TestNormalizeDir(t *testing.T) {
+	exec.NormalizeDir("")
+	exec.NormalizeDir(".")
+	exec.NormalizeDir("./ad/./c")
+	exec.NormalizeDir("./ad/../c")
+	exec.NormalizeDir("/ad/./c")
+	exec.NormalizeDir("../ad/./c")
+	exec.NormalizeDir("~/ad/./c")
 }
