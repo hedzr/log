@@ -7,6 +7,7 @@ package exec_test
 import (
 	"github.com/hedzr/log/exec"
 	"os"
+	"path"
 	"testing"
 )
 
@@ -67,5 +68,43 @@ func TestForDirMax(t *testing.T) {
 
 	if err != nil {
 		t.Errorf("wrong for ForDir(): %v", err)
+	}
+}
+
+func TestGetExecutableDir(t *testing.T) {
+	t.Logf("GetExecutablePath = %v", exec.GetExecutablePath())
+	t.Logf("GetExecutableDir = %v", exec.GetExecutableDir())
+	t.Logf("GetCurrentDir = %v", exec.GetCurrentDir())
+
+	fn := path.Join(exec.GetCurrentDir(), "dir.go")
+	if ok, err := exec.IsRegularFile(fn); err != nil || !ok {
+		t.Fatal("expecting regular file detected.")
+	}
+	if !exec.FileExists(fn) {
+		t.Fatal("expecting regular file existed.")
+	}
+
+	dn := path.Join(exec.GetCurrentDir(), ".github")
+	if err := exec.EnsureDir(dn); err != nil {
+		t.Fatal(err)
+	}
+	if err := exec.EnsureDirEnh(dn); err != nil {
+		t.Fatal(err)
+	}
+
+	dn = path.Join(exec.GetCurrentDir(), ".tmp1")
+	if err := exec.EnsureDirEnh(dn); err != nil {
+		t.Fatal(err)
+	}
+	if err := exec.RemoveDirRecursive(dn); err != nil {
+		t.Fatal(err)
+	}
+
+	dn = path.Join(dn, ".tmp2")
+	if err := exec.EnsureDirEnh(dn); err != nil {
+		t.Fatal(err)
+	}
+	if err := exec.RemoveDirRecursive(dn); err != nil {
+		t.Fatal(err)
 	}
 }
