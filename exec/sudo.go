@@ -52,6 +52,9 @@ func RunCommand(command string, readStdout bool, arguments ...string) (retCode i
 		}
 
 		defer stdout.Close()
+	} else {
+		cmd.Stdout = os.Stdout
+		//cmd.Stderr = os.Stderr
 	}
 
 	// Connect pipe to read Stderr
@@ -60,7 +63,7 @@ func RunCommand(command string, readStdout bool, arguments ...string) (retCode i
 		// Failed to connect pipe
 		return 0, "", fmt.Errorf("%q failed to connect stderr pipe: %v", command, err)
 	}
-	
+
 	defer stderr.Close()
 
 	// Do not use cmd.Run()
@@ -80,17 +83,17 @@ func RunCommand(command string, readStdout bool, arguments ...string) (retCode i
 	}
 
 	slurp, _ := ioutil.ReadAll(stderr)
-	
+
 	if err = cmd.Wait(); err != nil {
 		exitStatus, ok := IsExitError(err)
 		if ok {
 			// Command didn't exit with a zero exit status.
-			return exitStatus, output, errors.New("%q failed with stderr:\n%v\n", command, string(slurp)).Attach(err)
+			return exitStatus, output, errors.New("%q failed with stderr:\n%v\n  ", command, string(slurp)).Attach(err)
 		}
 
 		// An error occurred and there is no exit status.
 		//return 0, output, fmt.Errorf("%q failed: %v |\n  stderr: %s", command, err.Error(), slurp)
-		return 0, output, errors.New("%q failed with stderr:\n%v\n", command, string(slurp)).Attach(err)
+		return 0, output, errors.New("%q failed with stderr:\n%v\n  ", command, string(slurp)).Attach(err)
 	}
 
 	if readStdout {
