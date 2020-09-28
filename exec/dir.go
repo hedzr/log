@@ -175,7 +175,7 @@ func ForDir(root string, cb func(depth int, cwd string, fi os.FileInfo) (stop bo
 //          // ... doing something for a file,
 //			return
 //		})
-//		
+//
 func ForDirMax(root string, initialDepth, maxDepth int, cb func(depth int, cwd string, fi os.FileInfo) (stop bool, err error)) (err error) {
 	if maxDepth > 0 && initialDepth >= maxDepth {
 		return
@@ -212,22 +212,22 @@ func IsExecOwner(mode os.FileMode) bool {
 	return mode&0100 != 0
 }
 
-// IsExecOwner give the result of whether a file can be invoked by its unix-group
+// IsExecGroup give the result of whether a file can be invoked by its unix-group
 func IsExecGroup(mode os.FileMode) bool {
 	return mode&0010 != 0
 }
 
-// IsExecOwner give the result of whether a file can be invoked by its unix-all
+// IsExecOther give the result of whether a file can be invoked by its unix-all
 func IsExecOther(mode os.FileMode) bool {
 	return mode&0001 != 0
 }
 
-// IsExecOwner give the result of whether a file can be invoked by anyone
+// IsExecAny give the result of whether a file can be invoked by anyone
 func IsExecAny(mode os.FileMode) bool {
 	return mode&0111 != 0
 }
 
-// IsExecOwner give the result of whether a file can be invoked by all users
+// IsExecAll give the result of whether a file can be invoked by all users
 func IsExecAll(mode os.FileMode) bool {
 	return mode&0111 == 0111
 }
