@@ -5,9 +5,36 @@
 // library.
 package log
 
+import (
+	"os"
+	"strings"
+)
+
 type (
-	// Logger is a minimal logger with no more dependencies
-	Logger interface {
+	L interface {
+		// Trace prints all args to stdin if logging level is greater than TraceLevel
+		Trace(args ...interface{})
+		// Debug prints all args to stdin if logging level is greater than DebugLevel
+		Debug(args ...interface{})
+		// Info prints all args to stdin if logging level is greater than InfoLevel
+		Info(args ...interface{})
+		// Warn prints all args to stderr
+		Warn(args ...interface{})
+		// Error prints all args to stderr
+		Error(args ...interface{})
+		// Fatal is equivalent to Printf() followed by a call to os.Exit(1).
+		Fatal(args ...interface{})
+		// Panic is equivalent to Printf() followed by a call to panic().
+		Panic(args ...interface{})
+		// Print calls Output to print to the standard logger.
+		// Arguments are handled in the manner of fmt.Print.
+		Print(args ...interface{})
+		// Println calls Output to print to the standard logger.
+		// Arguments are handled in the manner of fmt.Println.
+		Println(args ...interface{})
+	}
+
+	LF interface {
 		// Tracef prints the text to stdin if logging level is greater than TraceLevel
 		Tracef(msg string, args ...interface{})
 		// Debugf prints the text to stdin if logging level is greater than DebugLevel
@@ -25,6 +52,11 @@ type (
 		// Printf calls Output to print to the standard logger.
 		// Arguments are handled in the manner of fmt.Printf.
 		Printf(msg string, args ...interface{})
+	}
+
+	// Logger is a minimal logger with no more dependencies
+	Logger interface {
+		LF
 
 		// SetLevel sets the logging level
 		SetLevel(lvl Level)
@@ -35,6 +67,12 @@ type (
 		Setup()
 
 		// AsFieldLogger() FieldLogger
+	}
+
+	// LoggerExt is a minimal logger with no more dependencies
+	LoggerExt interface {
+		L
+		Logger
 	}
 
 	// LoggerConfig is used for creating a minimal logger with no more dependencies
@@ -76,6 +114,44 @@ type (
 		Compress bool `json:"compress" yaml:"compress"`
 	}
 )
+
+// InTesting detects whether is running under go test mode
+func InTesting() bool { return InTestingT(os.Args) }
+
+// InTestingT detects whether is running under go test mode
+func InTestingT(args []string) bool {
+	if !strings.HasSuffix(args[0], ".test") &&
+		!strings.Contains(args[0], "/T/___Test") {
+
+		// [0] = /var/folders/td/2475l44j4n3dcjhqbmf3p5l40000gq/T/go-build328292371/b001/exe/main
+		// !strings.Contains(SavedOsArgs[0], "/T/go-build")
+
+		for _, s := range args {
+			if s == "-test.v" || s == "-test.run" {
+				return true
+			}
+		}
+		return false
+
+	}
+	return true
+}
+
+// AsL converts a logger to L type (with Info(...), ... prototypes)
+func AsL(logger LF) L {
+	if l, ok := logger.(L); ok {
+		return l
+	}
+	return nil
+}
+
+// AsLogger converts a logger to LF or Logger type (with Infof(...), ... prototypes)
+func AsLogger(logger L) Logger {
+	if l, ok := logger.(Logger); ok {
+		return l
+	}
+	return nil
+}
 
 // NewLoggerConfig returns a default LoggerConfig
 func NewLoggerConfig() *LoggerConfig {
@@ -142,6 +218,9 @@ func Errorf(msg string, args ...interface{}) {
 
 // Fatalf is equivalent to Printf() followed by a call to os.Exit(1).
 func Fatalf(msg string, args ...interface{}) {
+	if InTesting() {
+		logger.Panicf(msg, args)
+	}
 	logger.Fatalf(msg, args...)
 }
 
@@ -154,4 +233,72 @@ func Panicf(msg string, args ...interface{}) {
 // Arguments are handled in the manner of fmt.Printf.
 func Printf(msg string, args ...interface{}) {
 	logger.Printf(msg, args...)
+}
+
+// Trace prints all args to stdin if logging level is greater than TraceLevel
+func Trace(args ...interface{}) {
+	if l := AsL(logger); l != nil {
+		l.Trace(args...)
+	}
+}
+
+// Debug prints all args to stdin if logging level is greater than DebugLevel
+func Debug(args ...interface{}) {
+	if l := AsL(logger); l != nil {
+		l.Debug(args...)
+	}
+}
+
+// Info prints all args to stdin if logging level is greater than InfoLevel
+func Info(args ...interface{}) {
+	if l := AsL(logger); l != nil {
+		l.Info(args...)
+	}
+}
+
+// Warn prints all args to stderr
+func Warn(args ...interface{}) {
+	if l := AsL(logger); l != nil {
+		l.Warn(args...)
+	}
+}
+
+// Error prints all args to stderr
+func Error(args ...interface{}) {
+	if l := AsL(logger); l != nil {
+		l.Error(args...)
+	}
+}
+
+// Fatal is equivalent to Printf() followed by a call to os.Exit(1).
+func Fatal(args ...interface{}) {
+	if l := AsL(logger); l != nil {
+		if InTesting() {
+			l.Panic(args)
+		}
+		l.Fatal(args...)
+	}
+}
+
+// Panic is equivalent to Printf() followed by a call to panic().
+func Panic(args ...interface{}) {
+	if l := AsL(logger); l != nil {
+		l.Panic(args...)
+	}
+}
+
+// Print calls Output to print to the standard logger.
+// Arguments are handled in the manner of fmt.Print.
+func Print(args ...interface{}) {
+	if l := AsL(logger); l != nil {
+		l.Print(args...)
+	}
+}
+
+// Println calls Output to print to the standard logger.
+// Arguments are handled in the manner of fmt.Println.
+func Println(args ...interface{}) {
+	if l := AsL(logger); l != nil {
+		l.Println(args...)
+	}
 }

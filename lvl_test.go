@@ -3,6 +3,7 @@
 package log
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -52,4 +53,77 @@ func TestLog(t *testing.T) {
 	//Set("logger.target", "journal")
 	//Set("logger.format", "json")
 	//_ = internalGetWorker().getWithLogexInitializor(DebugLevel)(&rootCmdX.Command, []string{})
+
+	Trace("11", 11)
+	Debug("11", 11)
+	Info("11", 11)
+	Warn("11", 11)
+	Error("11", 11)
+	tztf1() // Fatal("11", 11)
+	tztp1() // Panic("11", 11)
+	Print("11", 11)
+	Println("11", 11)
+
+	Tracef("t9.%v", 11)
+	Debugf("t9.%v", 11)
+	Infof("t9.%v", 11)
+	Warnf("t9.%v", 11)
+	Errorf("t9.%v", 11)
+	tttf1() // Fatalf("t9.%v", 11)
+	tttp1() // Panicf("t9.%v", 11)
+	Printf("t9.%v", 11)
+
+	SetLogger(NewDummyLogger())
+	AsLogger(AsL(GetLogger()))
+	SetLevel(DebugLevel)
+	GetLevel()
+
+	if InDebugging() {
+		println(MinimalEnv())
+	}
+
+	println(MinimalEnv())
+
+	SetDebugMode(true)
+	SetTraceMode(true)
+}
+
+func tztf1() {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("caught: %v\n", err)
+		}
+	}()
+
+	Fatal("panic")
+}
+
+func tztp1() {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("caught: %v\n", err)
+		}
+	}()
+
+	Panic("panic")
+}
+
+func tttf1() {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("caught: %v\n", err)
+		}
+	}()
+
+	Fatalf("panic")
+}
+
+func tttp1() {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("caught: %v\n", err)
+		}
+	}()
+
+	Panicf("panic")
 }
