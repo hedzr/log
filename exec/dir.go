@@ -45,8 +45,8 @@ func GetCurrentDir() string {
 }
 
 // IsDirectory tests whether `path` is a directory or not
-func IsDirectory(path string) (bool, error) {
-	fileInfo, err := os.Stat(path)
+func IsDirectory(filepath string) (bool, error) {
+	fileInfo, err := os.Stat(filepath)
 	if err != nil {
 		return false, err
 	}
@@ -54,17 +54,117 @@ func IsDirectory(path string) (bool, error) {
 }
 
 // IsRegularFile tests whether `path` is a normal regular file or not
-func IsRegularFile(path string) (bool, error) {
-	fileInfo, err := os.Stat(path)
+func IsRegularFile(filepath string) (bool, error) {
+	fileInfo, err := os.Stat(filepath)
 	if err != nil {
 		return false, err
 	}
 	return fileInfo.Mode().IsRegular(), err
 }
 
+// FileModeIs tests the mode of 'filepath' with 'tester'. Examples:
+//
+//     var yes = exec.FileModeIs("/etc/passwd", exec.IsModeExecAny)
+//     var yes = exec.FileModeIs("/etc/passwd", exec.IsModeDirectory)
+//
+func FileModeIs(filepath string, tester func(mode os.FileMode) bool) (ret bool) {
+	fileInfo, err := os.Stat(filepath)
+	if err != nil {
+		return
+	}
+	ret = tester(fileInfo.Mode())
+	return
+}
+
+// IsModeRegular give the result of whether a file is a regular file
+func IsModeRegular(mode os.FileMode) bool { return mode.IsRegular() }
+
+// IsModeDirectory give the result of whether a file is a directory
+func IsModeDirectory(mode os.FileMode) bool { return mode&os.ModeDir != 0 }
+
+// IsModeSymbolicLink give the result of whether a file is a symbolic link
+func IsModeSymbolicLink(mode os.FileMode) bool { return mode&os.ModeSymlink != 0 }
+
+// IsModeDevice give the result of whether a file is a device
+func IsModeDevice(mode os.FileMode) bool { return mode&os.ModeDevice != 0 }
+
+// IsModeNamedPipe give the result of whether a file is a named pipe
+func IsModeNamedPipe(mode os.FileMode) bool { return mode&os.ModeNamedPipe != 0 }
+
+// IsModeSocket give the result of whether a file is a socket file
+func IsModeSocket(mode os.FileMode) bool { return mode&os.ModeSocket != 0 }
+
+// IsModeSetuid give the result of whether a file has the setuid bit
+func IsModeSetuid(mode os.FileMode) bool { return mode&os.ModeSetuid != 0 }
+
+// IsModeSetgid give the result of whether a file has the setgid bit
+func IsModeSetgid(mode os.FileMode) bool { return mode&os.ModeSetgid != 0 }
+
+// IsModeCharDevice give the result of whether a file is a character device
+func IsModeCharDevice(mode os.FileMode) bool { return mode&os.ModeCharDevice != 0 }
+
+// IsModeSticky give the result of whether a file is a sticky file
+func IsModeSticky(mode os.FileMode) bool { return mode&os.ModeSticky != 0 }
+
+// IsModeIrregular give the result of whether a file is a non-regular file; nothing else is known about this file
+func IsModeIrregular(mode os.FileMode) bool { return mode&os.ModeIrregular != 0 }
+
+//
+
+// IsModeExecOwner give the result of whether a file can be invoked by its unix-owner
+func IsModeExecOwner(mode os.FileMode) bool { return mode&0100 != 0 }
+
+// IsModeExecGroup give the result of whether a file can be invoked by its unix-group
+func IsModeExecGroup(mode os.FileMode) bool { return mode&0010 != 0 }
+
+// IsModeExecOther give the result of whether a file can be invoked by its unix-all
+func IsModeExecOther(mode os.FileMode) bool { return mode&0001 != 0 }
+
+// IsModeExecAny give the result of whether a file can be invoked by anyone
+func IsModeExecAny(mode os.FileMode) bool { return mode&0111 != 0 }
+
+// IsModeExecAll give the result of whether a file can be invoked by all users
+func IsModeExecAll(mode os.FileMode) bool { return mode&0111 == 0111 }
+
+//
+
+// IsModeWriteOwner give the result of whether a file can be written by its unix-owner
+func IsModeWriteOwner(mode os.FileMode) bool { return mode&0200 != 0 }
+
+// IsModeWriteGroup give the result of whether a file can be written by its unix-group
+func IsModeWriteGroup(mode os.FileMode) bool { return mode&0020 != 0 }
+
+// IsModeWriteOther give the result of whether a file can be written by its unix-all
+func IsModeWriteOther(mode os.FileMode) bool { return mode&0002 != 0 }
+
+// IsModeWriteAny give the result of whether a file can be written by anyone
+func IsModeWriteAny(mode os.FileMode) bool { return mode&0222 != 0 }
+
+// IsModeWriteAll give the result of whether a file can be written by all users
+func IsModeWriteAll(mode os.FileMode) bool { return mode&0222 == 0222 }
+
+//
+
+// IsModeReadOwner give the result of whether a file can be read by its unix-owner
+func IsModeReadOwner(mode os.FileMode) bool { return mode&0400 != 0 }
+
+// IsModeReadGroup give the result of whether a file can be read by its unix-group
+func IsModeReadGroup(mode os.FileMode) bool { return mode&0040 != 0 }
+
+// IsModeReadOther give the result of whether a file can be read by its unix-all
+func IsModeReadOther(mode os.FileMode) bool { return mode&0004 != 0 }
+
+// IsModeReadAny give the result of whether a file can be read by anyone
+func IsModeReadAny(mode os.FileMode) bool { return mode&0444 != 0 }
+
+// IsModeReadAll give the result of whether a file can be read by all users
+func IsModeReadAll(mode os.FileMode) bool { return mode&0444 == 0444 }
+
+//
+
 // FileExists returns the existence of an directory or file
-func FileExists(name string) bool {
-	if _, err := os.Stat(name); err != nil {
+func FileExists(filepath string) bool {
+	if _, err := os.Stat(os.ExpandEnv(filepath)); err != nil {
 		if os.IsNotExist(err) {
 			return false
 		}
@@ -176,6 +276,8 @@ func ForDir(root string, cb func(depth int, cwd string, fi os.FileInfo) (stop bo
 //			return
 //		})
 //
+// maxDepth = -1: no limit.
+// initialDepth: 0 if no idea.
 func ForDirMax(root string, initialDepth, maxDepth int, cb func(depth int, cwd string, fi os.FileInfo) (stop bool, err error)) (err error) {
 	if maxDepth > 0 && initialDepth >= maxDepth {
 		return
@@ -205,29 +307,4 @@ func ForDirMax(root string, initialDepth, maxDepth int, cb func(depth int, cwd s
 	}
 
 	return
-}
-
-// IsExecOwner give the result of whether a file can be invoked by its unix-owner
-func IsExecOwner(mode os.FileMode) bool {
-	return mode&0100 != 0
-}
-
-// IsExecGroup give the result of whether a file can be invoked by its unix-group
-func IsExecGroup(mode os.FileMode) bool {
-	return mode&0010 != 0
-}
-
-// IsExecOther give the result of whether a file can be invoked by its unix-all
-func IsExecOther(mode os.FileMode) bool {
-	return mode&0001 != 0
-}
-
-// IsExecAny give the result of whether a file can be invoked by anyone
-func IsExecAny(mode os.FileMode) bool {
-	return mode&0111 != 0
-}
-
-// IsExecAll give the result of whether a file can be invoked by all users
-func IsExecAll(mode os.FileMode) bool {
-	return mode&0111 == 0111
 }
