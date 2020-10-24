@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 )
@@ -130,6 +131,9 @@ func (s *stdLogger) SetLevel(lvl Level) {
 func (s *stdLogger) GetLevel() Level {
 	return s.Level
 }
+
+func (d *stdLogger) SetOutput(out io.Writer)    {}
+func (d *stdLogger) GetOutput() (out io.Writer) { return }
 
 func (s *stdLogger) Setup() {
 }

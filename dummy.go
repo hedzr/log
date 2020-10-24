@@ -4,6 +4,7 @@ package log
 
 import (
 	"fmt"
+	"io"
 	"os"
 )
 
@@ -48,6 +49,8 @@ func (d *dummyLogger) Panicf(msg string, args ...interface{}) { panic(fmt.Sprint
 func (d *dummyLogger) Printf(msg string, args ...interface{}) {}
 func (d *dummyLogger) SetLevel(lvl Level)                     {}
 func (d *dummyLogger) GetLevel() Level                        { return InfoLevel }
+func (d *dummyLogger) SetOutput(out io.Writer)                {}
+func (d *dummyLogger) GetOutput() (out io.Writer)             { return }
 func (d *dummyLogger) Setup()                                 {}
 
 //

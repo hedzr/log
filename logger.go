@@ -6,6 +6,7 @@
 package log
 
 import (
+	"io"
 	"os"
 	"strings"
 )
@@ -62,6 +63,10 @@ type (
 		SetLevel(lvl Level)
 		// GetLevel returns the current logging level
 		GetLevel() Level
+		// SetOutput setup the logging output device
+		SetOutput(out io.Writer)
+		// SetOutput returns the current logging output device
+		GetOutput() (out io.Writer)
 
 		// Setup will be invoked once an instance created
 		Setup()
@@ -77,14 +82,15 @@ type (
 
 	// LoggerConfig is used for creating a minimal logger with no more dependencies
 	LoggerConfig struct {
-		Enabled   bool
-		Backend   string // zap, sugar, logrus
-		Level     string
-		Format    string // text, json, ...
-		Target    string // console, file, console+file
-		Directory string
-		DebugMode bool `json:"-" yaml:"-"`
-		TraceMode bool `json:"-" yaml:"-"`
+		Enabled          bool
+		Backend          string // zap, sugar, logrus
+		Level            string // level
+		Format           string // text, json, ...
+		Target           string // console, file, console+file
+		Directory        string // logdir, for file
+		AllToErrorDevice bool   //
+		DebugMode        bool   `json:"-" yaml:"-"`
+		TraceMode        bool   `json:"-" yaml:"-"`
 
 		// the following options are copied from zap rotator
 
