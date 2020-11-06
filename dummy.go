@@ -38,7 +38,7 @@ func (d *dummyLogger) Warnf(msg string, args ...interface{})  {}
 func (d *dummyLogger) Errorf(msg string, args ...interface{}) {}
 
 func (d *dummyLogger) Fatalf(msg string, args ...interface{}) {
-	//panic("implement me")
+	// panic("implement me")
 	if InTesting() {
 		panic(fmt.Sprintf(msg, args...))
 	}
@@ -52,6 +52,7 @@ func (d *dummyLogger) GetLevel() Level                        { return InfoLevel
 func (d *dummyLogger) SetOutput(out io.Writer)                {}
 func (d *dummyLogger) GetOutput() (out io.Writer)             { return }
 func (d *dummyLogger) Setup()                                 {}
+func (d *dummyLogger) AddSkip(skip int) Logger                { return d }
 
 //
 //

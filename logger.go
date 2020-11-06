@@ -71,6 +71,9 @@ type (
 		// Setup will be invoked once an instance created
 		Setup()
 
+		// AddSkip adds an extra count to skip stack frames
+		AddSkip(skip int) Logger
+
 		// AsFieldLogger() FieldLogger
 	}
 

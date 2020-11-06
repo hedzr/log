@@ -124,16 +124,9 @@ func (s *stdLogger) Printf(msg string, args ...interface{}) {
 	s.outf(msg, args...)
 }
 
-func (s *stdLogger) SetLevel(lvl Level) {
-	s.Level = lvl
-}
-
-func (s *stdLogger) GetLevel() Level {
-	return s.Level
-}
-
+func (s *stdLogger) SetLevel(lvl Level)         { s.Level = lvl }
+func (s *stdLogger) GetLevel() Level            { return s.Level }
 func (d *stdLogger) SetOutput(out io.Writer)    {}
 func (d *stdLogger) GetOutput() (out io.Writer) { return }
-
-func (s *stdLogger) Setup() {
-}
+func (s *stdLogger) Setup()                     {}
+func (d *stdLogger) AddSkip(skip int) Logger    { return d }
