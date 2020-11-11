@@ -169,6 +169,13 @@ func NewLoggerConfig() *LoggerConfig {
 
 // NewLoggerConfigWith returns a default LoggerConfig
 func NewLoggerConfigWith(enabled bool, backend, level string) *LoggerConfig {
+	var dm, tm bool = GetDebugMode(), GetTraceMode()
+	if tm {
+		level = "debug"
+	}
+	if tm {
+		level = "trace"
+	}
 	return &LoggerConfig{
 		Enabled:   enabled,
 		Backend:   backend,
@@ -176,8 +183,8 @@ func NewLoggerConfigWith(enabled bool, backend, level string) *LoggerConfig {
 		Format:    "text",
 		Target:    "console",
 		Directory: "/var/log",
-		DebugMode: GetDebugMode(),
-		TraceMode: GetTraceMode(),
+		DebugMode: dm,
+		TraceMode: tm,
 
 		MaxSize:    1024, // megabytes
 		MaxBackups: 3,    // 3 backups kept at most
@@ -210,22 +217,22 @@ func Tracef(msg string, args ...interface{}) {
 
 // Debugf prints the text to stdin if logging level is greater than DebugLevel
 func Debugf(msg string, args ...interface{}) {
-	logger.Printf(msg, args...)
+	logger.Debugf(msg, args...)
 }
 
 // Infof prints the text to stdin if logging level is greater than InfoLevel
 func Infof(msg string, args ...interface{}) {
-	logger.Printf(msg, args...)
+	logger.Infof(msg, args...)
 }
 
 // Warnf prints the text to stderr
 func Warnf(msg string, args ...interface{}) {
-	logger.Printf(msg, args...)
+	logger.Warnf(msg, args...)
 }
 
 // Errorf prints the text to stderr
 func Errorf(msg string, args ...interface{}) {
-	logger.Printf(msg, args...)
+	logger.Errorf(msg, args...)
 }
 
 // Fatalf is equivalent to Printf() followed by a call to os.Exit(1).
