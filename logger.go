@@ -170,7 +170,7 @@ func NewLoggerConfig() *LoggerConfig {
 // NewLoggerConfigWith returns a default LoggerConfig
 func NewLoggerConfigWith(enabled bool, backend, level string) *LoggerConfig {
 	var dm, tm bool = GetDebugMode(), GetTraceMode()
-	if tm {
+	if dm {
 		level = "debug"
 	}
 	if tm {
