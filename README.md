@@ -137,16 +137,59 @@ func a(){
 ```
 
 ```go
+func GetExecutableDir() string
+func GetExecutablePath() string
 
-IsRegularFile
-FileExists
-EnsureDir
-EnsureDirEnh
-NormalizeDir
+func GetCurrentDir() string
+func IsDirectory(filepath string) (bool, error)
 
-```
+func IsRegularFile(filepath string) (bool, error)
 
-```go
+func FileModeIs(filepath string, tester func(mode os.FileMode) bool) (ret bool)
+
+func IsModeRegular(mode os.FileMode) bool
+func IsModeDirectory(mode os.FileMode) bool
+func IsModeSymbolicLink(mode os.FileMode) bool
+func IsModeDevice(mode os.FileMode) bool
+func IsModeNamedPipe(mode os.FileMode) bool
+func IsModeSocket(mode os.FileMode) bool
+func IsModeSetuid(mode os.FileMode) bool
+func IsModeSetgid(mode os.FileMode) bool
+func IsModeCharDevice(mode os.FileMode) bool
+func IsModeSticky(mode os.FileMode) bool
+func IsModeIrregular(mode os.FileMode) bool
+
+func IsModeExecOwner(mode os.FileMode) bool
+func IsModeExecGroup(mode os.FileMode) bool
+func IsModeExecOther(mode os.FileMode) bool
+func IsModeExecAny(mode os.FileMode) bool
+func IsModeExecAll(mode os.FileMode) bool
+
+func IsModeWriteOwner(mode os.FileMode) bool
+func IsModeWriteGroup(mode os.FileMode) bool
+func IsModeWriteOther(mode os.FileMode) bool
+func IsModeWriteAny(mode os.FileMode) bool
+func IsModeWriteAll(mode os.FileMode) bool
+func IsModeReadOther(mode os.FileMode) bool
+
+func IsModeReadOwner(mode os.FileMode) bool
+func IsModeReadGroup(mode os.FileMode) bool
+func IsModeReadOther(mode os.FileMode) bool
+func IsModeReadAny(mode os.FileMode) bool
+func IsModeReadAll(mode os.FileMode) bool
+
+func FileExists(path string) bool
+func EnsureDir(dir string) (err error)
+func EnsureDirEnh(dir string) (err error)
+
+func RemoveDirRecursive(dir string) (err error)
+
+func NormalizeDir(path string) string
+
+
+func ForDir(root string, cb func(depth int, cwd string, fi os.FileInfo) (stop bool, err error)) (err error)
+func ForDirMax(root string, initialDepth, maxDepth int, cb func(depth int, cwd string, fi os.FileInfo) (stop bool, err error)) (err error)
+
 _ = exec.ForDirMax(dir, 0, 1, func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
 	if fi.IsDir() {
 		return
