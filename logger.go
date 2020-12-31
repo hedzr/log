@@ -149,6 +149,9 @@ func InTestingT(args []string) bool {
 // AsL converts a logger to L type (with Info(...), ... prototypes)
 func AsL(logger LF) L {
 	if l, ok := logger.(L); ok {
+		if l1, ok := l.(Logger); ok {
+			return l1.AddSkip(1).(L)
+		}
 		return l
 	}
 	return nil
@@ -157,7 +160,7 @@ func AsL(logger LF) L {
 // AsLogger converts a logger to LF or Logger type (with Infof(...), ... prototypes)
 func AsLogger(logger L) Logger {
 	if l, ok := logger.(Logger); ok {
-		return l
+		return l.AddSkip(1)
 	}
 	return nil
 }
@@ -169,13 +172,18 @@ func NewLoggerConfig() *LoggerConfig {
 
 // NewLoggerConfigWith returns a default LoggerConfig
 func NewLoggerConfigWith(enabled bool, backend, level string) *LoggerConfig {
-	var dm, tm bool = GetDebugMode(), GetTraceMode()
+	var dm, tm = GetDebugMode(), GetTraceMode()
 	if dm {
 		level = "debug"
 	}
 	if tm {
 		level = "trace"
 	}
+	var l Level
+	l, _ = ParseLevel(level)
+	SetDebugMode(l >= DebugLevel)
+	SetTraceMode(l >= TraceLevel)
+	dm, tm = GetDebugMode(), GetTraceMode()
 	return &LoggerConfig{
 		Enabled:   enabled,
 		Backend:   backend,
@@ -212,46 +220,46 @@ func GetLogger() Logger { return logger }
 
 // Tracef prints the text to stdin if logging level is greater than TraceLevel
 func Tracef(msg string, args ...interface{}) {
-	logger.Printf(msg, args...)
+	logger.AddSkip(1).Printf(msg, args...)
 }
 
 // Debugf prints the text to stdin if logging level is greater than DebugLevel
 func Debugf(msg string, args ...interface{}) {
-	logger.Debugf(msg, args...)
+	logger.AddSkip(1).Debugf(msg, args...)
 }
 
 // Infof prints the text to stdin if logging level is greater than InfoLevel
 func Infof(msg string, args ...interface{}) {
-	logger.Infof(msg, args...)
+	logger.AddSkip(1).Infof(msg, args...)
 }
 
 // Warnf prints the text to stderr
 func Warnf(msg string, args ...interface{}) {
-	logger.Warnf(msg, args...)
+	logger.AddSkip(1).Warnf(msg, args...)
 }
 
 // Errorf prints the text to stderr
 func Errorf(msg string, args ...interface{}) {
-	logger.Errorf(msg, args...)
+	logger.AddSkip(1).Errorf(msg, args...)
 }
 
 // Fatalf is equivalent to Printf() followed by a call to os.Exit(1).
 func Fatalf(msg string, args ...interface{}) {
 	if InTesting() {
-		logger.Panicf(msg, args)
+		logger.AddSkip(1).Panicf(msg, args)
 	}
-	logger.Fatalf(msg, args...)
+	logger.AddSkip(1).Fatalf(msg, args...)
 }
 
 // Panicf is equivalent to Printf() followed by a call to panic().
 func Panicf(msg string, args ...interface{}) {
-	logger.Panicf(msg, args...)
+	logger.AddSkip(1).Panicf(msg, args...)
 }
 
 // Printf calls Output to print to the standard logger.
 // Arguments are handled in the manner of fmt.Printf.
 func Printf(msg string, args ...interface{}) {
-	logger.Printf(msg, args...)
+	logger.AddSkip(1).Printf(msg, args...)
 }
 
 // Trace prints all args to stdin if logging level is greater than TraceLevel
