@@ -220,7 +220,7 @@ func GetLogger() Logger { return logger }
 
 // Tracef prints the text to stdin if logging level is greater than TraceLevel
 func Tracef(msg string, args ...interface{}) {
-	logger.AddSkip(1).Printf(msg, args...)
+	logger.AddSkip(1).Tracef(msg, args...)
 }
 
 // Debugf prints the text to stdin if logging level is greater than DebugLevel
