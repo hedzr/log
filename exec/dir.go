@@ -240,6 +240,12 @@ func NormalizeDir(s string) string {
 }
 
 func normalizeDir(s string) string {
+	p := normalizeDirBasic(s)
+	p = filepath.Clean(p)
+	return p
+}
+
+func normalizeDirBasic(s string) string {
 	if len(s) == 0 {
 		return s
 	}
@@ -255,6 +261,40 @@ func normalizeDir(s string) string {
 		return path.Join(os.Getenv("HOME"), s[2:])
 	} else {
 		return s
+	}
+}
+
+// AbsPath returns a clean, normalized and absolute path string for the given pathname.
+func AbsPath(pathname string) string {
+	return absPath(pathname)
+}
+
+func absPath(pathname string) (abs string) {
+	abs = normalizePath(pathname)
+	if s, err := filepath.Abs(abs); err == nil {
+		abs = s
+	}
+	return
+}
+
+func normalizePath(pathname string) string {
+	p := normalizePathBasic(pathname)
+	p = filepath.Clean(p)
+	return p
+}
+
+func normalizePathBasic(pathname string) string {
+	if len(pathname) == 0 {
+		return pathname
+	}
+
+	pathname = os.Expand(pathname, os.Getenv)
+	if pathname[0] == '/' {
+		return pathname
+	} else if strings.HasPrefix(pathname, "~/") {
+		return path.Join(os.Getenv("HOME"), pathname[2:])
+	} else {
+		return pathname
 	}
 }
 
