@@ -277,6 +277,11 @@ func absPath(pathname string) (abs string) {
 	return
 }
 
+// NormalizePath cleans up the given pathname
+func NormalizePath(pathname string) string {
+	return normalizePath(pathname)
+}
+
 func normalizePath(pathname string) string {
 	p := normalizePathBasic(pathname)
 	p = filepath.Clean(p)
