@@ -122,6 +122,9 @@ type (
 		// using gzip. The default is not to perform compression.
 		Compress bool `json:"compress" yaml:"compress"`
 	}
+
+	// BuilderFunc provides a function prototype for creating a hedzr/log & hedzr/logex -compliant creator.
+	BuilderFunc func(config *LoggerConfig) (logger Logger)
 )
 
 // InTesting detects whether is running under go test mode

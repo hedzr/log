@@ -13,6 +13,11 @@ func NewDummyLogger() Logger {
 	return &dummyLogger{}
 }
 
+// NewDummyLoggerWithConfig return a dummy logger
+func NewDummyLoggerWithConfig(config *LoggerConfig) Logger {
+	return &dummyLogger{}
+}
+
 type dummyLogger struct{}
 
 func (d *dummyLogger) Trace(args ...interface{}) {}

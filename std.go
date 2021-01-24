@@ -17,6 +17,12 @@ func NewStdLoggerWith(lvl Level) Logger {
 	return &stdLogger{Level: lvl}
 }
 
+// NewStdLoggerWithConfig return a stdlib `log` logger
+func NewStdLoggerWithConfig(config *LoggerConfig) Logger {
+	l, _ := ParseLevel(config.Level)
+	return &stdLogger{Level: l}
+}
+
 type stdLogger struct {
 	Level
 }
