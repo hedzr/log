@@ -4,7 +4,9 @@ package exec
 
 import (
 	"errors"
+	"fmt"
 	"github.com/hedzr/log"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/user"
@@ -328,15 +330,15 @@ func ForDirMax(root string, initialDepth, maxDepth int, cb func(depth int, cwd s
 		return
 	}
 
-	var files []os.FileInfo
-	files, err = ioutil.ReadDir(os.ExpandEnv(root))
+	var dirs []os.FileInfo
+	dirs, err = ioutil.ReadDir(os.ExpandEnv(root))
 	if err != nil {
 		// Logger.Fatalf("error in ForDirMax(): %v", err)
 		return
 	}
 
 	var stop bool
-	for _, f := range files {
+	for _, f := range dirs {
 		//Logger.Printf("  - %v", f.Name())
 		if stop, err = cb(initialDepth, root, f); stop {
 			return
@@ -351,5 +353,140 @@ func ForDirMax(root string, initialDepth, maxDepth int, cb func(depth int, cwd s
 		}
 	}
 
+	return
+}
+
+// ForFile walks on `root` directory and its children
+func ForFile(root string, cb func(depth int, cwd string, fi os.FileInfo) (stop bool, err error)) (err error) {
+	err = ForFileMax(root, 0, -1, cb)
+	return
+}
+
+// ForFileMax walks on `root` directory and its children with nested levels up to `maxLength`.
+//
+// Example - discover folder just one level
+//
+//      _ = ForFileMax(dir, 0, 1, func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
+//			if fi.IsDir() {
+//				return
+//			}
+//          // ... doing something for a file,
+//			return
+//		})
+//
+// maxDepth = -1: no limit.
+// initialDepth: 0 if no idea.
+func ForFileMax(root string, initialDepth, maxDepth int, cb func(depth int, cwd string, fi os.FileInfo) (stop bool, err error)) (err error) {
+	if maxDepth > 0 && initialDepth >= maxDepth {
+		return
+	}
+
+	var dirs []os.FileInfo
+	dirs, err = ioutil.ReadDir(os.ExpandEnv(root))
+	if err != nil {
+		// Logger.Fatalf("error in ForFileMax(): %v", err)
+		return
+	}
+
+	var stop bool
+	for _, f := range dirs {
+		//Logger.Printf("  - %v", f.Name())
+		if err != nil {
+			log.NewStdLogger().Errorf("error in ForFileMax().cb: %v", err)
+		} else if f.IsDir() && (maxDepth <= 0 || (maxDepth > 0 && initialDepth+1 < maxDepth)) {
+			dir := path.Join(root, f.Name())
+			if err = ForFileMax(dir, initialDepth+1, maxDepth, cb); err != nil {
+				log.NewStdLogger().Errorf("error in ForFileMax(): %v", err)
+			}
+		} else if !f.IsDir() {
+			// log.Infof(" - %s", f.Name())
+			if stop, err = cb(initialDepth, root, f); stop {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+// DeleteFile deletes a file if exists
+func DeleteFile(dst string) (err error) {
+	dst = os.ExpandEnv(dst)
+	if FileExists(dst) {
+		err = os.Remove(dst)
+	}
+	return
+}
+
+// CopyFile copies a file from src to dst. If src and dst files exist, and are
+// the same, then return success. Otherwise, attempt to create a hard link
+// between the two files. If that fail, copy the file contents from src to dst.
+func CopyFileByLinkFirst(src, dst string) (err error) {
+	return copyFileByLinkFirst(src, dst, true)
+}
+
+// CopyFile will make a content clone of src.
+func CopyFile(src, dst string) (err error) {
+	return copyFileByLinkFirst(src, dst, false)
+}
+
+func copyFileByLinkFirst(src, dst string, linkAtFirst bool) (err error) {
+	src = os.ExpandEnv(src)
+	dst = os.ExpandEnv(dst)
+	sfi, err := os.Stat(src)
+	if err != nil {
+		return
+	}
+	if !sfi.Mode().IsRegular() {
+		// cannot copy non-regular files (e.g., directories,
+		// symlinks, devices, etc.)
+		return fmt.Errorf("CopyFile: non-regular source file %s (%q)", sfi.Name(), sfi.Mode().String())
+	}
+	dfi, err := os.Stat(dst)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return
+		}
+	} else {
+		if !(dfi.Mode().IsRegular()) {
+			return fmt.Errorf("CopyFile: non-regular destination file %s (%q)", dfi.Name(), dfi.Mode().String())
+		}
+		if os.SameFile(sfi, dfi) {
+			return
+		}
+	}
+	if linkAtFirst {
+		if err = os.Link(src, dst); err == nil {
+			return
+		}
+	}
+	err = copyFileContents(src, dst)
+	return
+}
+
+// copyFileContents copies the contents of the file named src to the file named
+// by dst. The file will be created if it does not already exist. If the
+// destination file exists, all it's contents will be replaced by the contents
+// of the source file.
+func copyFileContents(src, dst string) (err error) {
+	in, err := os.Open(src)
+	if err != nil {
+		return
+	}
+	defer in.Close()
+	out, err := os.Create(dst)
+	if err != nil {
+		return
+	}
+	defer func() {
+		cerr := out.Close()
+		if err == nil {
+			err = cerr
+		}
+	}()
+	if _, err = io.Copy(out, in); err != nil {
+		return
+	}
+	err = out.Sync()
 	return
 }
