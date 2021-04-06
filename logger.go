@@ -221,6 +221,14 @@ func SetLogger(l Logger) { l.SetLevel(logger.GetLevel()); logger = l }
 // GetLogger returns the package-level logger globally
 func GetLogger() Logger { return logger }
 
+// Skip ignore some extra caller frames
+func Skip(skip int) Logger {
+	logger.AddSkip(skip)
+	return logger
+}
+
+//
+
 // Tracef prints the text to stdin if logging level is greater than TraceLevel
 func Tracef(msg string, args ...interface{}) {
 	logger.Tracef(msg, args...)
