@@ -122,17 +122,60 @@ func a(){
 
 ### Utilities
 
+#### Basics
+
+`basics.Peripheral` is a interface to simplify and normalize the wrapping on basics infrastructures.
+
+```go
+type (
+	// Peripheral represents a basic infrastructure which can
+	// be initialized and destroyed.
+	//
+	// For a Peripheral, the host should add it into a list
+	// and destroy them while host is shutting down.
+	Peripheral interface {
+		// Close provides a closer to cleanup the peripheral gracefully
+		Close()
+	}
+)
+
+// Basic is a base type to simplify your codes since you're using Peripheral type.
+type Basic struct {
+	peripherals []Peripheral
+}
+
+// AddPeripheral adds a Peripheral object into Basic holder/host.
+func (s *Basic) AddPeripheral(peripherals ...Peripheral) {
+	s.peripherals = append(s.peripherals, peripherals...)
+}
+
+// Close provides a closer to cleanup the peripheral gracefully
+func (s *Basic) Close() {
+	for _, p := range s.peripherals {
+		if p != nil {
+			p.Close()
+		}
+	}
+	s.peripherals = nil
+}
+```
+
+And, `Basic` is a simple base type so that you can embed it.
+
+
 #### Directory Helper
 
-in `exec/dir.go`,
+deprecated: in `exec/dir.go`,
+
+Since v0.3.12, these functions has been moved into `dir` package.
 
 ```go
 import "github.com/hedzr/log/exec"
 
 func a(){
-  print(exec.IsDiretory(exec.GetCurrentDir()))
-  print(exec.GetExecutablePath())
-  print(exec.GetExecutableDir())
+  print(dir.IsDiretory(exec.GetCurrentDir()))
+  print(dir.GetExecutablePath())
+  print(dir.GetExecutableDir())
 }
 ```
 
@@ -197,6 +240,15 @@ _ = exec.ForDirMax(dir, 0, 1, func(depth int, cwd string, fi os.FileInfo) (stop 
       // ... doing something for a file,
 	return
 })
+
+func ForFile(root string, cb func(depth int, cwd string, fi os.FileInfo) (stop bool, err error)) (err error)
+func ForFileMax(root string, initialDepth, maxDepth int, cb func(depth int, cwd string, fi os.FileInfo) (stop bool, err error)) (err error)
+
+
+func DeleteFile(dst string) (err error)
+func CopyFileByLinkFirst(src, dst string) (err error)
+func CopyFile(src, dst string) (err error)
+
 
 ```
 
