@@ -5,7 +5,7 @@
 package dir_test
 
 import (
-	"github.com/hedzr/log/exec"
+	"github.com/hedzr/log/dir"
 	"os"
 	"path"
 	"testing"
@@ -21,18 +21,18 @@ func TestIsDirectory(t *testing.T) {
 	//t.Logf("InTesting: %v", cmdr.InTesting())
 	//t.Logf("InDebugging: %v", cmdr.InDebugging())
 
-	exec.NormalizeDir("")
+	dir.NormalizeDir("")
 
-	if yes, err := exec.IsDirectory("./conf.d1"); yes {
+	if yes, err := dir.IsDirectory("./conf.d1"); yes {
 		t.Fatal(err)
 	}
-	if yes, err := exec.IsDirectory("../exec"); !yes {
+	if yes, err := dir.IsDirectory("../dir"); !yes {
 		t.Fatal(err)
 	}
-	if yes, err := exec.IsRegularFile("./doc1.golang"); yes {
+	if yes, err := dir.IsRegularFile("./doc1.golang"); yes {
 		t.Fatal(err)
 	}
-	if yes, err := exec.IsRegularFile("./dir.go"); !yes {
+	if yes, err := dir.IsRegularFile("./dir.go"); !yes {
 		t.Fatal(err)
 	}
 }
@@ -40,12 +40,12 @@ func TestIsDirectory(t *testing.T) {
 func TestForDir(t *testing.T) {
 	// defer logex.CaptureLog(t).Release()
 
-	dir := "$HOME/.local"
-	if !exec.FileExists(dir) {
-		dir = "$HOME/.config"
+	dirName := "$HOME/.local"
+	if !dir.FileExists(dirName) {
+		dirName = "$HOME/.config"
 	}
 
-	err := exec.ForDir(dir, func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
+	err := dir.ForDir(dirName, func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
 		if fi.IsDir() {
 			t.Logf("  - dir: %v/[%v]", cwd, fi.Name())
 		} else {
@@ -62,12 +62,12 @@ func TestForDir(t *testing.T) {
 func TestForDirMax(t *testing.T) {
 	// defer logex.CaptureLog(t).Release()
 
-	dir := "$HOME/.local"
-	if !exec.FileExists(dir) {
-		dir = "$HOME/.config"
+	dirName := "$HOME/.local"
+	if !dir.FileExists(dirName) {
+		dirName = "$HOME/.config"
 	}
 
-	err := exec.ForDirMax(dir, 0, 2, func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
+	err := dir.ForDirMax(dirName, 0, 2, func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
 		if fi.IsDir() {
 			t.Logf("  - dir: %v/[%v]", cwd, fi.Name())
 		} else {
@@ -82,15 +82,15 @@ func TestForDirMax(t *testing.T) {
 }
 
 func TestGetExecutableDir(t *testing.T) {
-	t.Logf("GetExecutablePath = %v", exec.GetExecutablePath())
-	t.Logf("GetExecutableDir = %v", exec.GetExecutableDir())
-	t.Logf("GetCurrentDir = %v", exec.GetCurrentDir())
+	t.Logf("GetExecutablePath = %v", dir.GetExecutablePath())
+	t.Logf("GetExecutableDir = %v", dir.GetExecutableDir())
+	t.Logf("GetCurrentDir = %v", dir.GetCurrentDir())
 
-	fn := path.Join(exec.GetCurrentDir(), "dir.go")
-	if ok, err := exec.IsRegularFile(fn); err != nil || !ok {
+	fn := path.Join(dir.GetCurrentDir(), "dir.go")
+	if ok, err := dir.IsRegularFile(fn); err != nil || !ok {
 		t.Fatal("expecting regular file detected.")
 	}
-	if !exec.FileExists(fn) {
+	if !dir.FileExists(fn) {
 		t.Fatal("expecting regular file existed.")
 	}
 
@@ -99,97 +99,107 @@ func TestGetExecutableDir(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	exec.FileModeIs(fn, exec.IsModeIrregular)
-	exec.FileModeIs(fn, exec.IsModeRegular)
-	exec.FileModeIs(fn, exec.IsModeDirectory)
-	exec.FileModeIs("/etc", exec.IsModeDirectory)
-	exec.FileModeIs("/etc", exec.IsModeIrregular)
-	exec.FileModeIs("/etc/not-existence", exec.IsModeIrregular)
+	dir.FileModeIs(fn, dir.IsModeIrregular)
+	dir.FileModeIs(fn, dir.IsModeRegular)
+	dir.FileModeIs(fn, dir.IsModeDirectory)
+	dir.FileModeIs("/etc", dir.IsModeDirectory)
+	dir.FileModeIs("/etc", dir.IsModeIrregular)
+	dir.FileModeIs("/etc/not-existence", dir.IsModeIrregular)
 
-	exec.IsModeExecOwner(fileInfo.Mode())
-	exec.IsModeExecGroup(fileInfo.Mode())
-	exec.IsModeExecOther(fileInfo.Mode())
-	exec.IsModeExecAny(fileInfo.Mode())
-	exec.IsModeExecAll(fileInfo.Mode())
+	dir.IsModeExecOwner(fileInfo.Mode())
+	dir.IsModeExecGroup(fileInfo.Mode())
+	dir.IsModeExecOther(fileInfo.Mode())
+	dir.IsModeExecAny(fileInfo.Mode())
+	dir.IsModeExecAll(fileInfo.Mode())
 
-	exec.IsModeWriteOwner(fileInfo.Mode())
-	exec.IsModeWriteGroup(fileInfo.Mode())
-	exec.IsModeWriteOther(fileInfo.Mode())
-	exec.IsModeWriteAny(fileInfo.Mode())
-	exec.IsModeWriteAll(fileInfo.Mode())
+	dir.IsModeWriteOwner(fileInfo.Mode())
+	dir.IsModeWriteGroup(fileInfo.Mode())
+	dir.IsModeWriteOther(fileInfo.Mode())
+	dir.IsModeWriteAny(fileInfo.Mode())
+	dir.IsModeWriteAll(fileInfo.Mode())
 
-	exec.IsModeReadOwner(fileInfo.Mode())
-	exec.IsModeReadGroup(fileInfo.Mode())
-	exec.IsModeReadOther(fileInfo.Mode())
-	exec.IsModeReadAny(fileInfo.Mode())
-	exec.IsModeReadAll(fileInfo.Mode())
+	dir.IsModeReadOwner(fileInfo.Mode())
+	dir.IsModeReadGroup(fileInfo.Mode())
+	dir.IsModeReadOther(fileInfo.Mode())
+	dir.IsModeReadAny(fileInfo.Mode())
+	dir.IsModeReadAll(fileInfo.Mode())
 
-	exec.IsModeDirectory(fileInfo.Mode())
-	exec.IsModeSymbolicLink(fileInfo.Mode())
-	exec.IsModeDevice(fileInfo.Mode())
-	exec.IsModeNamedPipe(fileInfo.Mode())
-	exec.IsModeSocket(fileInfo.Mode())
-	exec.IsModeSetuid(fileInfo.Mode())
-	exec.IsModeSetgid(fileInfo.Mode())
-	exec.IsModeCharDevice(fileInfo.Mode())
-	exec.IsModeSticky(fileInfo.Mode())
-	exec.IsModeIrregular(fileInfo.Mode())
+	dir.IsModeDirectory(fileInfo.Mode())
+	dir.IsModeSymbolicLink(fileInfo.Mode())
+	dir.IsModeDevice(fileInfo.Mode())
+	dir.IsModeNamedPipe(fileInfo.Mode())
+	dir.IsModeSocket(fileInfo.Mode())
+	dir.IsModeSetuid(fileInfo.Mode())
+	dir.IsModeSetgid(fileInfo.Mode())
+	dir.IsModeCharDevice(fileInfo.Mode())
+	dir.IsModeSticky(fileInfo.Mode())
+	dir.IsModeIrregular(fileInfo.Mode())
 }
 
 func TestEnsureDir(t *testing.T) {
 	//
 
-	if err := exec.EnsureDir(""); err == nil {
+	if err := dir.EnsureDir(""); err == nil {
 		t.Fatal("expecting an error.")
 	}
 
-	if err := exec.EnsureDirEnh(""); err == nil {
+	if err := dir.EnsureDirEnh(""); err == nil {
 		t.Fatal("expecting an error.")
 	}
 
 	//
 
-	dn := path.Join(exec.GetCurrentDir(), ".tmp.1")
-	if err := exec.EnsureDir(dn); err != nil {
+	dn := path.Join(dir.GetCurrentDir(), ".tmp.1")
+	if err := dir.EnsureDir(dn); err != nil {
 		t.Fatal(err)
 	}
-	if err := exec.RemoveDirRecursive(dn); err != nil {
+	if err := dir.RemoveDirRecursive(dn); err != nil {
 		t.Fatal(err)
 	}
 
 	//
 
-	dn = path.Join(exec.GetCurrentDir(), ".github")
-	if err := exec.EnsureDir(dn); err != nil {
+	dn = path.Join(dir.GetCurrentDir(), ".github")
+	if err := dir.EnsureDir(dn); err != nil {
 		t.Fatal(err)
 	}
-	if err := exec.EnsureDirEnh(dn); err != nil {
+	if err := dir.EnsureDirEnh(dn); err != nil {
 		t.Fatal(err)
 	}
 
-	dn = path.Join(exec.GetCurrentDir(), ".tmp1")
-	if err := exec.EnsureDirEnh(dn); err != nil {
+	dn = path.Join(dir.GetCurrentDir(), ".tmp1")
+	if err := dir.EnsureDirEnh(dn); err != nil {
 		t.Fatal(err)
 	}
-	if err := exec.RemoveDirRecursive(dn); err != nil {
+	if err := dir.RemoveDirRecursive(dn); err != nil {
 		t.Fatal(err)
 	}
 
 	dn = path.Join(dn, ".tmp2")
-	if err := exec.EnsureDirEnh(dn); err != nil {
+	if err := dir.EnsureDirEnh(dn); err != nil {
 		t.Fatal(err)
 	}
-	if err := exec.RemoveDirRecursive(dn); err != nil {
+	if err := dir.RemoveDirRecursive(dn); err != nil {
 		t.Fatal(err)
 	}
 }
 
 func TestNormalizeDir(t *testing.T) {
-	exec.NormalizeDir("")
-	exec.NormalizeDir(".")
-	exec.NormalizeDir("./ad/./c")
-	exec.NormalizeDir("./ad/../c")
-	exec.NormalizeDir("/ad/./c")
-	exec.NormalizeDir("../ad/./c")
-	exec.NormalizeDir("~/ad/./c")
+	dir.NormalizeDir("")
+	dir.NormalizeDir(".")
+	dir.NormalizeDir("./ad/./c")
+	dir.NormalizeDir("./ad/../c")
+	dir.NormalizeDir("/ad/./c")
+	dir.NormalizeDir("../ad/./c")
+	dir.NormalizeDir("~/ad/./c")
+}
+
+func TestDirTimestamps(t *testing.T) {
+	fileInfo, err := os.Stat("/tmp")
+	if err != nil {
+		return
+	}
+	t.Logf("create time: %v", dir.FileCreatedTime(fileInfo))
+	t.Logf("access time: %v", dir.FileAccessedTime(fileInfo))
+	t.Logf("modified time: %v", dir.FileModifiedTime(fileInfo))
 }

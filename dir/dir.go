@@ -66,27 +66,6 @@ func IsRegularFile(filepath string) (bool, error) {
 	return fileInfo.Mode().IsRegular(), err
 }
 
-// FileCreatedTime return the creation time of a file
-func FileCreatedTime(fileInfo os.FileInfo) (tm time.Time) {
-	ts := fileInfo.Sys().(*syscall.Stat_t)
-	tm = timeSpecToTime(ts.Ctimespec)
-	return
-}
-
-// FileAccessedTime return the creation time of a file
-func FileAccessedTime(fileInfo os.FileInfo) (tm time.Time) {
-	ts := fileInfo.Sys().(*syscall.Stat_t)
-	tm = timeSpecToTime(ts.Atimespec)
-	return
-}
-
-// FileModifiedTime return the creation time of a file
-func FileModifiedTime(fileInfo os.FileInfo) (tm time.Time) {
-	ts := fileInfo.Sys().(*syscall.Stat_t)
-	tm = timeSpecToTime(ts.Mtimespec)
-	return
-}
-
 func timeSpecToTime(ts syscall.Timespec) time.Time {
 	return time.Unix(int64(ts.Sec), int64(ts.Nsec))
 }
