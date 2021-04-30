@@ -1,5 +1,3 @@
-// +build go1.16
-
 /*
  * Copyright © 2021 Hedzr Yeh.
  */
