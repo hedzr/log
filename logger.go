@@ -12,6 +12,7 @@ import (
 )
 
 type (
+	// L provides a basic logger interface
 	L interface {
 		// Trace prints all args to stdin if logging level is greater than TraceLevel
 		Trace(args ...interface{})
@@ -35,6 +36,7 @@ type (
 		Println(args ...interface{})
 	}
 
+	// LF provides a L logger interface and format prototypes (such as Debugf...)
 	LF interface {
 		// Tracef prints the text to stdin if logging level is greater than TraceLevel
 		Tracef(msg string, args ...interface{})
