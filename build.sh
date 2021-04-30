@@ -11,6 +11,9 @@ cov(){
 }
 
 bf1(){
+	# https://gist.github.com/asukakenji/f15ba7e588ac42795f421b48b8aede63
+	# Or: go tool dist list
+	# Missed: posix
 	for GOOS in $(go tool dist list|awk -F'/' '{print $1}'|sort -u); do echo -e "\n\nTESTING FOR $GOOS ...\n"; go test -v -race -coverprofile=coverage-$GOOS.txt -test.run=^TestDirTimestamps$ ./dir/ || exit; done
 }
 
