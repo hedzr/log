@@ -109,17 +109,6 @@ func RunCommand(command string, readStdout bool, arguments ...string) (retCode i
 	return 0, output, nil
 }
 
-// IsExitError checks the error object
-func IsExitError(err error) (int, bool) {
-	if ee, ok := err.(*exec.ExitError); ok {
-		if status, ok := ee.Sys().(syscall.WaitStatus); ok {
-			return status.ExitStatus(), true
-		}
-	}
-
-	return 0, false
-}
-
 // IsEAccess detects whether err is a EACCESS errno or not
 func IsEAccess(err error) bool {
 	if e, ok := err.(*os.PathError); ok && e.Err == syscall.EACCES {
