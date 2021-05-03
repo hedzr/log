@@ -12,6 +12,7 @@ func FromSystemdLogger(sl SystemdLogger) Logger {
 		lvl: logger.GetLevel(),
 		w:   nil,
 		sl:  sl,
+		old: logger,
 	}
 	return l
 }
@@ -20,21 +21,43 @@ type toSystemdLogger struct {
 	lvl Level
 	w   io.Writer
 	sl  SystemdLogger
+	old Logger
 }
 
 func (d *toSystemdLogger) Trace(args ...interface{}) {
 	if d.lvl >= TraceLevel {
 		_ = d.sl.Info(args...)
+		if d.old != nil {
+			AsL(d.old).Trace(args...)
+		}
 	}
 }
 func (d *toSystemdLogger) Debug(args ...interface{}) {
 	if d.lvl >= DebugLevel {
 		_ = d.sl.Info(args...)
+		if d.old != nil {
+			AsL(d.old).Debug(args...)
+		}
 	}
 }
-func (d *toSystemdLogger) Info(args ...interface{})  { _ = d.sl.Info(args...) }
-func (d *toSystemdLogger) Warn(args ...interface{})  { _ = d.sl.Warning(args...) }
-func (d *toSystemdLogger) Error(args ...interface{}) { _ = d.sl.Error(args...) }
+func (d *toSystemdLogger) Info(args ...interface{}) {
+	_ = d.sl.Info(args...)
+	if d.old != nil {
+		AsL(d.old).Info(args...)
+	}
+}
+func (d *toSystemdLogger) Warn(args ...interface{}) {
+	_ = d.sl.Warning(args...)
+	if d.old != nil {
+		AsL(d.old).Warn(args...)
+	}
+}
+func (d *toSystemdLogger) Error(args ...interface{}) {
+	_ = d.sl.Error(args...)
+	if d.old != nil {
+		AsL(d.old).Error(args...)
+	}
+}
 
 func (d *toSystemdLogger) Fatal(args ...interface{}) {
 	d.Error(args...)
@@ -48,21 +71,52 @@ func (d *toSystemdLogger) Panic(args ...interface{}) {
 	d.Error(args...)
 	panic(fmt.Sprint(args...))
 }
-func (d *toSystemdLogger) Print(args ...interface{})   { _ = d.sl.Info(args...) }
-func (d *toSystemdLogger) Println(args ...interface{}) { _ = d.sl.Info(args...) }
+func (d *toSystemdLogger) Print(args ...interface{}) {
+	_ = d.sl.Info(args...)
+	if d.old != nil {
+		AsL(d.old).Info(args...)
+	}
+}
+func (d *toSystemdLogger) Println(args ...interface{}) {
+	_ = d.sl.Info(args...)
+	if d.old != nil {
+		AsL(d.old).Info(args...)
+	}
+}
 func (d *toSystemdLogger) Tracef(msg string, args ...interface{}) {
 	if d.lvl >= TraceLevel {
 		_ = d.sl.Infof(msg, args...)
+		if d.old != nil {
+			d.old.Tracef(msg, args...)
+		}
 	}
 }
 func (d *toSystemdLogger) Debugf(msg string, args ...interface{}) {
 	if d.lvl >= DebugLevel {
 		_ = d.sl.Infof(msg, args...)
+		if d.old != nil {
+			d.old.Debugf(msg, args...)
+		}
 	}
 }
-func (d *toSystemdLogger) Infof(msg string, args ...interface{})  { _ = d.sl.Infof(msg, args...) }
-func (d *toSystemdLogger) Warnf(msg string, args ...interface{})  { _ = d.sl.Warningf(msg, args...) }
-func (d *toSystemdLogger) Errorf(msg string, args ...interface{}) { _ = d.sl.Errorf(msg, args...) }
+func (d *toSystemdLogger) Infof(msg string, args ...interface{}) {
+	_ = d.sl.Infof(msg, args...)
+	if d.old != nil {
+		d.old.Infof(msg, args...)
+	}
+}
+func (d *toSystemdLogger) Warnf(msg string, args ...interface{}) {
+	_ = d.sl.Warningf(msg, args...)
+	if d.old != nil {
+		d.old.Warnf(msg, args...)
+	}
+}
+func (d *toSystemdLogger) Errorf(msg string, args ...interface{}) {
+	_ = d.sl.Errorf(msg, args...)
+	if d.old != nil {
+		d.old.Errorf(msg, args...)
+	}
+}
 
 func (d *toSystemdLogger) Fatalf(msg string, args ...interface{}) {
 	// panic("implement me")
