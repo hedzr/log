@@ -6,4 +6,4 @@ go 1.13
 
 // replace github.com/hedzr/log => ../log
 
-require gopkg.in/hedzr/errors.v2 v2.1.3
+require gopkg.in/hedzr/errors.v2 v2.1.5
