@@ -39,6 +39,10 @@ type (
 		// Compress determines if the rotated log files should be compressed
 		// using gzip. The default is not to perform compression.
 		Compress bool `json:"compress" yaml:"compress"`
+
+		ExtraSkip       int
+		ShortTimestamp  bool
+		TimestampFormat string // never used
 	}
 )
 
@@ -75,5 +79,8 @@ func NewLoggerConfigWith(enabled bool, backend, level string) *LoggerConfig {
 		MaxBackups: 3,    // 3 backups kept at most
 		MaxAge:     7,    // 7 days kept at most
 		Compress:   true, // disabled by default
+
+		ExtraSkip:      -1,
+		ShortTimestamp: true,
 	}
 }
