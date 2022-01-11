@@ -41,7 +41,7 @@ type (
 		Compress bool `json:"compress" yaml:"compress"`
 
 		ExtraSkip       int
-		ShortTimestamp  bool
+		ShortTimestamp  bool   // remove year field for a shorter timestamp stringify
 		TimestampFormat string // never used
 	}
 )
@@ -80,7 +80,8 @@ func NewLoggerConfigWith(enabled bool, backend, level string) *LoggerConfig {
 		MaxAge:     7,    // 7 days kept at most
 		Compress:   true, // disabled by default
 
-		ExtraSkip:      -1,
-		ShortTimestamp: true,
+		ExtraSkip:       -1,
+		ShortTimestamp:  false, //
+		TimestampFormat: "",
 	}
 }
