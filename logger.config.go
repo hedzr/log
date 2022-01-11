@@ -47,12 +47,12 @@ type (
 )
 
 // NewLoggerConfig returns a default LoggerConfig
-func NewLoggerConfig() *LoggerConfig {
-	return NewLoggerConfigWith(true, "sugar", "info")
+func NewLoggerConfig(opts ...Opt) *LoggerConfig {
+	return NewLoggerConfigWith(true, "sugar", "info", opts...)
 }
 
 // NewLoggerConfigWith returns a default LoggerConfig
-func NewLoggerConfigWith(enabled bool, backend, level string) *LoggerConfig {
+func NewLoggerConfigWith(enabled bool, backend, level string, opts ...Opt) *LoggerConfig {
 	var dm, tm = GetDebugMode(), GetTraceMode()
 	if dm {
 		level = "debug"
@@ -60,12 +60,15 @@ func NewLoggerConfigWith(enabled bool, backend, level string) *LoggerConfig {
 	if tm {
 		level = "trace"
 	}
+
 	var l Level
 	l, _ = ParseLevel(level)
 	SetDebugMode(l >= DebugLevel)
 	SetTraceMode(l >= TraceLevel)
+
 	dm, tm = GetDebugMode(), GetTraceMode()
-	return &LoggerConfig{
+
+	lc := &LoggerConfig{
 		Enabled:   enabled,
 		Backend:   backend,
 		Level:     level,
@@ -83,5 +86,27 @@ func NewLoggerConfigWith(enabled bool, backend, level string) *LoggerConfig {
 		ExtraSkip:       -1,
 		ShortTimestamp:  false, //
 		TimestampFormat: "",
+	}
+
+	for _, opt := range opts {
+		opt(lc)
+	}
+	return lc
+}
+
+type Opt func(lc *LoggerConfig)
+
+func WithTimestamp(short bool, format ...string) Opt {
+	return func(lc *LoggerConfig) {
+		lc.ShortTimestamp = short
+		for _, fmt := range format {
+			lc.TimestampFormat = fmt
+		}
+	}
+}
+
+func WithExtraSkip(extraSkip int) Opt {
+	return func(lc *LoggerConfig) {
+		lc.ExtraSkip = extraSkip
 	}
 }
