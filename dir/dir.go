@@ -314,7 +314,7 @@ func normalizePathBasic(pathname string) string {
 // ForDir walks on `root` directory and its children
 func ForDir(
 	root string,
-	cb func(depth int, dir string, fi os.FileInfo) (stop bool, err error),
+	cb func(depth int, dirname string, fi os.FileInfo) (stop bool, err error),
 	excludes ...string,
 ) (err error) {
 	err = ForDirMax(root, 0, -1, cb, excludes...)
@@ -325,7 +325,7 @@ func ForDir(
 //
 // Example - discover folder just one level
 //
-//      _ = ForDirMax(dir, 0, 1, func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
+//      _ = ForDirMax(dir, 0, 1, func(depth int, dirname string, fi os.FileInfo) (stop bool, err error) {
 //			if fi.IsDir() {
 //				return
 //			}
@@ -339,7 +339,7 @@ func ForDirMax(
 	root string,
 	initialDepth int,
 	maxDepth int,
-	cb func(depth int, dir string, fi os.FileInfo) (stop bool, err error),
+	cb func(depth int, dirname string, fi os.FileInfo) (stop bool, err error),
 	excludes ...string,
 ) (err error) {
 	if maxDepth > 0 && initialDepth >= maxDepth {
@@ -360,6 +360,7 @@ func ForDirMax(
 			log.NewStdLogger().Errorf("error in ForDirMax().cb: %v", err)
 			continue
 		}
+
 		if f.IsDir() && (maxDepth <= 0 || (maxDepth > 0 && initialDepth+1 < maxDepth)) {
 			e := false
 			dir := path.Join(root, f.Name())
@@ -388,7 +389,7 @@ func ForDirMax(
 // ForFile walks on `root` directory and its children
 func ForFile(
 	root string,
-	cb func(depth int, cwd string, fi os.FileInfo) (stop bool, err error),
+	cb func(depth int, dirname string, fi os.FileInfo) (stop bool, err error),
 	excludes ...string,
 ) (err error) {
 	err = ForFileMax(root, 0, -1, cb, excludes...)
@@ -399,7 +400,7 @@ func ForFile(
 //
 // Example - discover folder just one level
 //
-//      _ = ForFileMax(dir, 0, 1, func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
+//      _ = ForFileMax(dir, 0, 1, func(depth int, dirname string, fi os.FileInfo) (stop bool, err error) {
 //			if fi.IsDir() {
 //				return
 //			}
@@ -412,7 +413,7 @@ func ForFile(
 func ForFileMax(
 	root string,
 	initialDepth, maxDepth int,
-	cb func(depth int, cwd string, fi os.FileInfo) (stop bool, err error),
+	cb func(depth int, dirname string, fi os.FileInfo) (stop bool, err error),
 	excludes ...string,
 ) (err error) {
 	if maxDepth > 0 && initialDepth >= maxDepth {
