@@ -312,8 +312,12 @@ func normalizePathBasic(pathname string) string {
 }
 
 // ForDir walks on `root` directory and its children
-func ForDir(root string, cb func(depth int, dir string, fi os.FileInfo) (stop bool, err error)) (err error) {
-	err = ForDirMax(root, 0, -1, cb)
+func ForDir(
+	root string,
+	cb func(depth int, dir string, fi os.FileInfo) (stop bool, err error),
+	excludes ...string,
+) (err error) {
+	err = ForDirMax(root, 0, -1, cb, excludes...)
 	return
 }
 
@@ -331,7 +335,13 @@ func ForDir(root string, cb func(depth int, dir string, fi os.FileInfo) (stop bo
 //
 // maxDepth = -1: no limit.
 // initialDepth: 0 if no idea.
-func ForDirMax(root string, initialDepth, maxDepth int, cb func(depth int, dir string, fi os.FileInfo) (stop bool, err error)) (err error) {
+func ForDirMax(
+	root string,
+	initialDepth int,
+	maxDepth int,
+	cb func(depth int, dir string, fi os.FileInfo) (stop bool, err error),
+	excludes ...string,
+) (err error) {
 	if maxDepth > 0 && initialDepth >= maxDepth {
 		return
 	}
@@ -348,8 +358,21 @@ func ForDirMax(root string, initialDepth, maxDepth int, cb func(depth int, dir s
 		//Logger.Printf("  - %v", f.Name())
 		if err != nil {
 			log.NewStdLogger().Errorf("error in ForDirMax().cb: %v", err)
-		} else if f.IsDir() && (maxDepth <= 0 || (maxDepth > 0 && initialDepth+1 < maxDepth)) {
+			continue
+		}
+		if f.IsDir() && (maxDepth <= 0 || (maxDepth > 0 && initialDepth+1 < maxDepth)) {
+			e := false
 			dir := path.Join(root, f.Name())
+			for _, ptn := range excludes {
+				if IsWildMatch(dir, ptn) {
+					e = true
+					break
+				}
+			}
+			if e {
+				continue
+			}
+
 			if stop, err = cb(initialDepth, dir, f); stop {
 				return
 			}
@@ -363,8 +386,12 @@ func ForDirMax(root string, initialDepth, maxDepth int, cb func(depth int, dir s
 }
 
 // ForFile walks on `root` directory and its children
-func ForFile(root string, cb func(depth int, cwd string, fi os.FileInfo) (stop bool, err error)) (err error) {
-	err = ForFileMax(root, 0, -1, cb)
+func ForFile(
+	root string,
+	cb func(depth int, cwd string, fi os.FileInfo) (stop bool, err error),
+	excludes ...string,
+) (err error) {
+	err = ForFileMax(root, 0, -1, cb, excludes...)
 	return
 }
 
@@ -382,7 +409,12 @@ func ForFile(root string, cb func(depth int, cwd string, fi os.FileInfo) (stop b
 //
 // maxDepth = -1: no limit.
 // initialDepth: 0 if no idea.
-func ForFileMax(root string, initialDepth, maxDepth int, cb func(depth int, cwd string, fi os.FileInfo) (stop bool, err error)) (err error) {
+func ForFileMax(
+	root string,
+	initialDepth, maxDepth int,
+	cb func(depth int, cwd string, fi os.FileInfo) (stop bool, err error),
+	excludes ...string,
+) (err error) {
 	if maxDepth > 0 && initialDepth >= maxDepth {
 		return
 	}
@@ -399,12 +431,42 @@ func ForFileMax(root string, initialDepth, maxDepth int, cb func(depth int, cwd 
 		//Logger.Printf("  - %v", f.Name())
 		if err != nil {
 			log.NewStdLogger().Errorf("error in ForFileMax().cb: %v", err)
-		} else if f.IsDir() && (maxDepth <= 0 || (maxDepth > 0 && initialDepth+1 < maxDepth)) {
+			continue
+		}
+
+		if f.IsDir() && (maxDepth <= 0 || (maxDepth > 0 && initialDepth+1 < maxDepth)) {
+			e := false
 			dir := path.Join(root, f.Name())
+			for _, ptn := range excludes {
+				if IsWildMatch(dir, ptn) {
+					e = true
+					break
+				}
+			}
+			if e {
+				continue
+			}
+
 			if err = ForFileMax(dir, initialDepth+1, maxDepth, cb); err != nil {
 				log.NewStdLogger().Errorf("error in ForFileMax(): %v", err)
 			}
-		} else if !f.IsDir() {
+
+			continue
+		}
+
+		if !f.IsDir() {
+			e := false
+			fullName := path.Join(root, f.Name())
+			for _, ptn := range excludes {
+				if IsWildMatch(fullName, ptn) {
+					e = true
+					break
+				}
+			}
+			if e {
+				continue
+			}
+
 			// log.Infof(" - %s", f.Name())
 			if stop, err = cb(initialDepth, root, f); stop {
 				return
