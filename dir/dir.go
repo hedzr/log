@@ -478,6 +478,32 @@ func ForFileMax(
 	return
 }
 
+// PushDir provides a shortcut to enter a folder and restore at
+// the end of your current function scope.
+// PushDir returns a functor and assumes you will DEFER call it.
+//
+// For example:
+//
+//     func TestSth() {
+//         defer dir.PushDir("/your/working/dir")()
+//         // do sth under '/your/working/dir' ...
+//     }
+//
+// BEWARE DON'T miss the ending brakets for defer call.
+func PushDir(dirname string) (closer func()) {
+	savedDir := GetCurrentDir()
+	var err error
+	if err = os.Chdir(dirname); err != nil {
+		//err = nil //ignore path err
+		return
+	}
+	return func() {
+		if err == nil {
+			_ = os.Chdir(savedDir)
+		}
+	}
+}
+
 // DeleteFile deletes a file if exists
 func DeleteFile(dst string) (err error) {
 	dst = os.ExpandEnv(dst)
