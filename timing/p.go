@@ -20,8 +20,11 @@ func New(opts ...Opt) P {
 
 // P is a timing tool interface type
 type P interface {
+	// WithWriter allows putting a printer for dump the timing information
 	WithWriter(writer Writer) P
+	// WithoutWriter could clear the internal writer
 	WithoutWriter() P
+	// Duration returns the timing result of an invocation
 	Duration() time.Duration
 }
 

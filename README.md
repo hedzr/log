@@ -13,6 +13,18 @@
 <!-- [![codecov](https://codecov.io/gh/hedzr/log/branch/master/graph/badge.svg)](https://codecov.io/gh/hedzr/log) -->
 
 
+## Features
+
+1. Common Interfaces for logging: so we can replace logging backends transparently
+2. Most commonly helpers on:
+   1. **basics and closers**: the basic infrastructures/peripherals with Open/Close interfaces
+   2. **buildtags**: testers via buildtags: docker,k8s,istio
+   6. **detects**: testers in another way
+   4. **dir**: folder and files
+   5. **exec**: make system call and sudo
+   7. **timing**: a timing and printing tool for runtime debugging
+   8. **trace**: some tracing structure
+   9. ...
 
 ## Common Interfaces for logging
 
@@ -94,13 +106,13 @@ type (
 
 
 
-## Functions
+### Functions
 
-### Package-level functions
+#### Package-level functions
 
 Panicf, Fatalf, Errorf, Warnf, Infof, Debugf, Tracef
 
-### Dummy and Standard Logger
+#### Dummy and Standard Logger
 
 See the following codes:
 
@@ -120,9 +132,9 @@ func a(){
 }
 ```
 
-### Utilities
+## Utilities
 
-#### Basics
+### Basics
 
 `basics.Peripheral` is a interface to simplify and normalize the wrapping on basics infrastructures.
 
@@ -163,7 +175,7 @@ func (s *Basic) Close() {
 And, `Basic` is a simple base type so that you can embed it.
 
 
-#### Directory Helper
+### Directory Helper
 
 deprecated: in `exec/dir.go`,
 
@@ -254,7 +266,7 @@ func CopyFile(src, dst string) (err error)
 
 
 
-#### Exec Helpers
+### Exec Helpers
 
 ```go
 import "github.com/hedzr/log/exec"
@@ -269,7 +281,7 @@ exec.IsEAccess()
 
 
 
-#### Trace Helpers
+### Trace Helpers
 
 ```go
 import "github.com/hedzr/log/trace"

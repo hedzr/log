@@ -45,11 +45,11 @@ func (s *c) RegisterCloseFns(fns ...func()) {
 }
 
 type w struct {
-	funcs []func()
+	fns []func()
 }
 
 func (s *w) Close() {
-	for _, c := range s.funcs {
+	for _, c := range s.fns {
 		if c != nil {
 			c()
 		}
