@@ -161,6 +161,6 @@ func GetLogger() Logger { return logger }
 
 // Skip ignore some extra caller frames
 func Skip(skip int) Logger {
-	logger.AddSkip(skip)
-	return logger
+	return logger.AddSkip(skip)
+	//return logger
 }
