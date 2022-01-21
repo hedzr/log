@@ -14,6 +14,117 @@ import (
 	"sync"
 )
 
+// New return a calling object to allow you to make the fluent call.
+//
+// Just like:
+//
+//     exec.New().WithCommand("bash", "-c", "echo hello world!").Run()
+//     err = exec.New().WithCommand("bash", "-c", "echo hello world!").RunAndCheckError()
+//
+// Processing the invoke result:
+//
+//     exec.New().
+//         WithCommand("bash", "-c", "echo hello world!").
+//         WithStdoutCaught().
+//         WithOnOK(func(retCode int, stdoutText string) { }).
+//         WithStderrCaught().
+//         WithOnError(func(err error, retCode int, stdoutText, stderrText string) { }).
+//         Run()
+//
+// Use context:
+//
+//     exec.New().
+//         WithCommand("bash", "-c", "echo hello world!").
+//         WithContext(context.TODO()).
+//         Run()
+//
+func New(opts ...Opt) *calling {
+	c := &calling{}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
+}
+
+func (c *calling) Run()                    { _ = c.run() }
+func (c *calling) RunAndCheckError() error { return c.run() }
+
+func (c *calling) WithCommandArgs(cmd string, args ...string) *calling {
+	c.Cmd = exec.Command(cmd, args...)
+	return c
+}
+
+func (c *calling) WithCommandString(cmd string) *calling {
+	a := strings.Split(cmd, " ")
+	c.Cmd = exec.Command(a[0], a[1:]...)
+	return c
+}
+
+func (c *calling) WithCommand(cmd ...string) *calling {
+	c.Cmd = exec.Command(cmd[0], cmd[1:]...)
+	return c
+}
+
+func (c *calling) WithEnv(key, value string) *calling {
+	if key != "" {
+		if c.envCopied == false {
+			c.envCopied = true
+			c.Cmd.Env = append(c.Cmd.Env, os.Environ()...)
+		}
+		c.Cmd.Env = append(c.Cmd.Env, key+"="+value)
+	}
+	return c
+}
+
+func (c *calling) WithWorkDir(dir string) *calling {
+	c.Cmd.Dir = dir
+	return c
+}
+
+func (c *calling) WithExtraFiles(files ...*os.File) *calling {
+	c.Cmd.ExtraFiles = files
+	return c
+}
+
+func (c *calling) WithContext(ctx context.Context) *calling {
+	c.Cmd = exec.CommandContext(ctx, c.Cmd.Path, c.Cmd.Args...)
+	return c
+}
+
+func (c *calling) WithStdoutCaught(writer ...io.Writer) *calling {
+	for _, w := range writer {
+		c.stdoutWriter = w
+	}
+	c.stdout, c.err = c.Cmd.StdoutPipe()
+	if c.err != nil {
+		// Failed to connect pipe
+		c.err = fmt.Errorf("failed to connect stdout pipe: %v, cmd: %q", c.err, c.Path)
+	}
+	return c
+}
+
+func (c *calling) WithStderrCaught(writer ...io.Writer) *calling {
+	for _, w := range writer {
+		c.stderrWriter = w
+	}
+	c.stderr, c.err = c.Cmd.StderrPipe()
+	if c.err != nil {
+		// Failed to connect pipe
+		c.err = fmt.Errorf("failed to connect stderr pipe: %v, cmd: %q", c.err, c.Path)
+	}
+	return c
+}
+
+func (c *calling) WithOnOK(onOK func(retCode int, stdoutText string)) *calling {
+	c.onOK = onOK
+	return c
+}
+
+func (c *calling) WithOnError(onError func(err error, retCode int, stdoutText, stderrText string)) *calling {
+	c.onError = onError
+	return c
+}
+
 type calling struct {
 	*exec.Cmd
 
@@ -35,21 +146,8 @@ type calling struct {
 	onError func(err error, retCode int, stdoutText, stderrText string)
 }
 
-func New(opts ...Opt) *calling {
-	c := &calling{}
-	for _, opt := range opts {
-		opt(c)
-	}
-	return c
-}
-
-func (c *calling) RunAndCheckError() error {
-	c.Run()
-	return c.err
-}
-
-func (c *calling) Run() {
-	err := c.runNow()
+func (c *calling) run() (err error) {
+	err = c.runNow()
 	if err == nil {
 		if c.onOK != nil {
 			c.onOK(c.retCode, c.output.String())
@@ -150,82 +248,6 @@ func (c *calling) runNow() error {
 func (c *calling) OutputText() string { return c.output.String() }
 func (c *calling) SlurpText() string  { return c.slurp.String() }
 func (c *calling) RetCode() int       { return c.retCode }
-
-func (c *calling) WithCommand(cmd string, args ...string) *calling {
-	c.Cmd = exec.Command(cmd, args...)
-	return c
-}
-
-func (c *calling) WithCommandString(cmd string) *calling {
-	a := strings.Split(cmd, " ")
-	c.Cmd = exec.Command(a[0], a[1:]...)
-	return c
-}
-
-func (c *calling) WithCommandSlice(cmd ...string) *calling {
-	c.Cmd = exec.Command(cmd[0], cmd[1:]...)
-	return c
-}
-
-func (c *calling) WithEnv(key, value string) *calling {
-	if key != "" {
-		if c.envCopied == false {
-			c.envCopied = true
-			c.Cmd.Env = append(c.Cmd.Env, os.Environ()...)
-		}
-		c.Cmd.Env = append(c.Cmd.Env, key+"="+value)
-	}
-	return c
-}
-
-func (c *calling) WithWorkDir(dir string) *calling {
-	c.Cmd.Dir = dir
-	return c
-}
-
-func (c *calling) WithExtraFiles(files ...*os.File) *calling {
-	c.Cmd.ExtraFiles = files
-	return c
-}
-
-func (c *calling) WithContext(ctx context.Context) *calling {
-	c.Cmd = exec.CommandContext(ctx, c.Cmd.Path, c.Cmd.Args...)
-	return c
-}
-
-func (c *calling) WithStdoutCaught(writer ...io.Writer) *calling {
-	for _, w := range writer {
-		c.stdoutWriter = w
-	}
-	c.stdout, c.err = c.Cmd.StdoutPipe()
-	if c.err != nil {
-		// Failed to connect pipe
-		c.err = fmt.Errorf("failed to connect stdout pipe: %v, cmd: %q", c.err, c.Path)
-	}
-	return c
-}
-
-func (c *calling) WithStderrCaught(writer ...io.Writer) *calling {
-	for _, w := range writer {
-		c.stderrWriter = w
-	}
-	c.stderr, c.err = c.Cmd.StderrPipe()
-	if c.err != nil {
-		// Failed to connect pipe
-		c.err = fmt.Errorf("failed to connect stderr pipe: %v, cmd: %q", c.err, c.Path)
-	}
-	return c
-}
-
-func (c *calling) WithOnOK(onOK func(retCode int, stdoutText string)) *calling {
-	c.onOK = onOK
-	return c
-}
-
-func (c *calling) WithOnError(onError func(err error, retCode int, stdoutText, stderrText string)) *calling {
-	c.onError = onError
-	return c
-}
 
 type Opt func(*calling)
 

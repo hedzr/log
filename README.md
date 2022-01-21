@@ -268,6 +268,8 @@ func CopyFile(src, dst string) (err error)
 
 ### Exec Helpers
 
+#### Style 1
+
 ```go
 import "github.com/hedzr/log/exec"
 
@@ -279,6 +281,44 @@ exec.IsExitError()
 exec.IsEAccess()
 ```
 
+#### Style 2
+
+```go
+import "github.com/hedzr/log/exec"
+
+func Call(cmd string, fn func(retCode int, stdoutText string)) (err error)
+func CallQuiet(cmd string, fn func(retCode int, stdoutText string)) (err error)
+func CallSlice(cmd []string, fn func(retCode int, stdoutText string)) (err error)
+func CallSliceQuiet(cmd []string, fn func(retCode int, stdoutText string)) (err error)
+```
+
+#### Style 3 - New Fluent API
+
+```go
+import "github.com/hedzr/log/exec"
+
+exec.New().WithCommand("bash", "-c", "echo hello world!").Run()
+
+err = exec.New().WithCommand("bash", "-c", "echo hello world!").RunAndCheckError()
+
+// Processing the invoke result:
+
+exec.New().
+	WithCommand("bash", "-c", "echo hello world!").
+	WithStdoutCaught().
+	WithOnOK(func(retCode int, stdoutText string) { }).
+	WithStderrCaught().
+	WithOnError(func(err error, retCode int, stdoutText, stderrText string) { }).
+	Run()
+
+// Use context:
+
+exec.New().
+	WithCommand("bash", "-c", "echo hello world!").
+	WithContext(context.TODO()).
+	Run()
+
+```
 
 
 ### Trace Helpers
