@@ -285,6 +285,13 @@ func absPath(pathname string) (abs string) {
 	return
 }
 
+func FollowSymLink(pathname string) string {
+	if t, err := filepath.EvalSymlinks(pathname); err == nil {
+		return t
+	}
+	return pathname
+}
+
 // NormalizePath cleans up the given pathname
 func NormalizePath(pathname string) string {
 	return normalizePath(pathname)
@@ -495,7 +502,7 @@ func PushDir(dirname string) (closer func()) {
 	var err error
 	if err = os.Chdir(dirname); err != nil {
 		//err = nil //ignore path err
-		return
+		return func() {}
 	}
 	return func() {
 		if err == nil {
