@@ -63,8 +63,22 @@ func (c *calling) WithCommandString(cmd string) *calling {
 	return c
 }
 
-func (c *calling) WithCommand(cmd ...string) *calling {
-	c.Cmd = exec.Command(cmd[0], cmd[1:]...)
+func toStringSimple(i interface{}) string {
+	return fmt.Sprintf("%v", i)
+}
+
+func (c *calling) WithCommand(cmd ...interface{}) *calling {
+	var args []string
+	for _, a := range cmd[1:] {
+		if as, ok := a.([]string); ok {
+			args = append(args, as...)
+		} else if as, ok := a.(string); ok {
+			args = append(args, as)
+		} else {
+			args = append(args, toStringSimple(a))
+		}
+	}
+	c.Cmd = exec.Command(toStringSimple(cmd[0]), args...)
 	return c
 }
 
@@ -294,7 +308,7 @@ func WithCommandString(cmd string) Opt {
 	}
 }
 
-func WithCommand(cmd ...string) Opt {
+func WithCommand(cmd ...interface{}) Opt {
 	return func(c *calling) {
 		c.WithCommand(cmd...)
 	}
