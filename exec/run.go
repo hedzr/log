@@ -34,9 +34,25 @@ import (
 // Use context:
 //
 //     exec.New().
-//         WithCommand("bash", "-c", "echo hello world!").
+//         WithCommandString("bash -c 'echo hello world!'", '\'').
 //         WithContext(context.TODO()).
 //         Run()
+//     // or double quote pieces
+//     exec.New().
+//         WithCommandString("bash -c \"echo hello world!\"").
+//         Run()
+//
+// Auto Left-Padding if WithOnError / WithOnOK /
+// WithStderrCaught / WithStdoutCaught specified
+// (It's no effects when you caught stdout/stderr with
+// the handlers above. In this case, do it with
+// LeftPad manually).
+//
+//     args := []string{"-al", "/usr/local/bin"}
+//     err := exec.New().
+//         WithPadding(8).
+//         WithCommandArgs("ls", args...).
+//         RunAndCheckError()
 //
 func New(opts ...Opt) *calling {
 	c := &calling{}
@@ -57,14 +73,12 @@ func (c *calling) WithCommandArgs(cmd string, args ...string) *calling {
 	return c
 }
 
-func (c *calling) WithCommandString(cmd string) *calling {
-	a := strings.Split(cmd, " ")
+// WithCommandString allows split command-line by quote
+// characters (default is double-quote).
+func (c *calling) WithCommandString(cmd string, quoteChars ...rune) *calling {
+	a := SplitCommandString(cmd, quoteChars...)
 	c.Cmd = exec.Command(a[0], a[1:]...)
 	return c
-}
-
-func toStringSimple(i interface{}) string {
-	return fmt.Sprintf("%v", i)
 }
 
 func (c *calling) WithCommand(cmd ...interface{}) *calling {
@@ -138,6 +152,20 @@ func (c *calling) WithOnError(onError func(err error, retCode int, stdoutText, s
 	return c
 }
 
+// WithPadding apply left paddings to stdout/err if no
+// WithOnError / WithOnOK / WithStderrCaught / WithStdoutCaught
+// specified.
+//
+func (c *calling) WithPadding(leftPadding int) *calling {
+	c.leftPadding = leftPadding
+	return c
+}
+
+func (c *calling) WithVerboseCommandLine(verbose bool) *calling {
+	c.verbose = verbose
+	return c
+}
+
 type calling struct {
 	*exec.Cmd
 
@@ -148,6 +176,8 @@ type calling struct {
 	stdoutWriter io.Writer
 	stderrWriter io.Writer
 	env          []string
+	leftPadding  int
+	verbose      bool // print command-line in std-output dumping
 
 	retCode int
 	output  bytes.Buffer
@@ -163,26 +193,46 @@ func (c *calling) run() (err error) {
 
 	err = c.runNow()
 
+	var ok, er bool
 	if err == nil {
 		if c.onOK != nil {
 			c.onOK(c.retCode, c.output.String())
+			ok = true
 		}
-		return
 	}
 
-	if c.onError != nil {
+	if c.onError != nil && err != nil {
 		c.onError(err, c.retCode, c.output.String(), c.slurp.String())
+		er = true
 		return
 	}
 
 	if !c.quiet {
-		if c.output.Len() > 0 {
-			log.Printf("OUTPUT:\n%v\n", c.output.String())
+		if c.output.Len() > 0 && ok == false {
+			if c.leftPadding > 0 {
+				fmt.Print(strings.Repeat(" ", c.leftPadding))
+			}
+			if c.verbose {
+				fmt.Printf("OUTPUT // %v:\n", c.Cmd.Args)
+			} else {
+				fmt.Print("OUTPUT:\n")
+			}
+			fmt.Printf("%v\n", leftPad(c.output.String(), c.leftPadding))
 		}
-		if c.slurp.Len() > 0 {
-			log.Errorf("SLURP:\n%v\n", c.slurp.String())
+		if c.slurp.Len() > 0 && er == false && c.retCode != 0 {
+			if c.leftPadding > 0 {
+				_, _ = fmt.Fprintf(os.Stderr, "%v", strings.Repeat(" ", c.leftPadding))
+			}
+			if c.verbose {
+				fmt.Printf("SLURP // %v:\n", c.Cmd.Args)
+			} else {
+				fmt.Print("SLURP:\n")
+			}
+			_, _ = fmt.Fprintf(os.Stderr, "%v\n", leftPad(c.slurp.String(), c.leftPadding))
 		}
-		log.Errorf("system call failed: %v, command-line: %q", err, c.Path)
+		if err != nil {
+			log.Errorf("system call failed (command-line: %q): %v", c.Args, err)
+		}
 	}
 	return
 }
@@ -196,7 +246,7 @@ func (c *calling) runNow() error {
 
 	// log.Debugf("ENV:\n%v", c.Cmd.Env)
 
-	if c.onOK != nil && c.stdout == nil {
+	if (c.onOK != nil || c.leftPadding > 0) && c.stdout == nil {
 		c.prepareStdoutPipe()
 	}
 
@@ -206,7 +256,14 @@ func (c *calling) runNow() error {
 		go func() {
 			defer c.wg.Done()
 			if c.stdoutWriter != nil {
-				_, _ = io.Copy(c.stdoutWriter, c.stderr)
+				if c.stdoutWriter == os.Stdout && c.leftPadding > 0 {
+					_, _ = io.Copy(&c.output, c.stdout)
+					b := []byte(leftPad(c.output.String(), c.leftPadding))
+					_, _ = c.stdoutWriter.Write(b)
+					c.output.Reset()
+				} else {
+					_, _ = io.Copy(c.stdoutWriter, c.stderr)
+				}
 			} else {
 				_, _ = io.Copy(&c.output, c.stdout)
 			}
@@ -215,7 +272,7 @@ func (c *calling) runNow() error {
 		c.Stdout = os.Stdout
 	}
 
-	if c.onError != nil && c.stderr == nil {
+	if (c.onError != nil || c.leftPadding > 0) && c.stderr == nil {
 		c.prepareStderrPipe()
 	}
 
@@ -225,7 +282,14 @@ func (c *calling) runNow() error {
 		go func() {
 			defer c.wg.Done()
 			if c.stderrWriter != nil {
-				_, _ = io.Copy(c.stderrWriter, c.stderr)
+				if c.stderrWriter == os.Stderr && c.leftPadding > 0 {
+					_, _ = io.Copy(&c.slurp, c.stderr)
+					b := []byte(leftPad(c.slurp.String(), c.leftPadding))
+					_, _ = c.stderrWriter.Write(b)
+					c.slurp.Reset()
+				} else {
+					_, _ = io.Copy(c.stderrWriter, c.stderr)
+				}
 			} else {
 				_, _ = io.Copy(&c.slurp, c.stderr)
 			}
@@ -362,10 +426,14 @@ func WithOnError(onError func(err error, retCode int, stdoutText, stderrText str
 	}
 }
 
-// LookPath searches for an executable named file in the
-// directories named by the PATH environment variable.
-// If file contains a slash, it is tried directly and the PATH is not consulted.
-// The result may be an absolute path or a path relative to the current directory.
-func LookPath(file string) (string, error) {
-	return exec.LookPath(file)
+func WithPadding(leftPadding int) Opt {
+	return func(c *calling) {
+		c.WithPadding(leftPadding)
+	}
+}
+
+func WithVerboseCommandLine(verbose bool) Opt {
+	return func(c *calling) {
+		c.WithVerboseCommandLine(verbose)
+	}
 }
