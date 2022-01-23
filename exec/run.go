@@ -108,7 +108,7 @@ func (c *calling) WithExtraFiles(files ...*os.File) *calling {
 }
 
 func (c *calling) WithContext(ctx context.Context) *calling {
-	c.Cmd = exec.CommandContext(ctx, c.Cmd.Path, c.Cmd.Args...)
+	c.Cmd = exec.CommandContext(ctx, c.Cmd.Path, c.Cmd.Args[1:]...)
 	return c
 }
 
