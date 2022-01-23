@@ -171,8 +171,8 @@ type calling struct {
 
 	err          error
 	wg           sync.WaitGroup
-	stdout       io.ReadCloser
-	stderr       io.ReadCloser
+	stdoutPiper  io.ReadCloser
+	stderrPiper  io.ReadCloser
 	stdoutWriter io.Writer
 	stderrWriter io.Writer
 	env          []string
@@ -217,7 +217,7 @@ func (c *calling) run() (err error) {
 			} else {
 				fmt.Print("OUTPUT:\n")
 			}
-			fmt.Printf("%v\n", leftPad(c.output.String(), c.leftPadding))
+			_, _ = fmt.Fprintf(os.Stdout, "%v\n", leftPad(c.output.String(), c.leftPadding))
 		}
 		if c.slurp.Len() > 0 && er == false && c.retCode != 0 {
 			if c.leftPadding > 0 {
@@ -246,56 +246,56 @@ func (c *calling) runNow() error {
 
 	// log.Debugf("ENV:\n%v", c.Cmd.Env)
 
-	if (c.onOK != nil || c.leftPadding > 0) && c.stdout == nil {
+	if (c.onOK != nil || c.leftPadding > 0) && c.stdoutPiper == nil {
 		c.prepareStdoutPipe()
 	}
 
-	if c.stdout != nil {
-		defer c.stdout.Close()
+	if c.stdoutPiper != nil {
+		defer c.stdoutPiper.Close()
 		c.wg.Add(1)
 		go func() {
 			defer c.wg.Done()
 			if c.stdoutWriter != nil {
 				if c.stdoutWriter == os.Stdout && c.leftPadding > 0 {
-					_, _ = io.Copy(&c.output, c.stdout)
+					_, _ = io.Copy(&c.output, c.stdoutPiper)
 					b := []byte(leftPad(c.output.String(), c.leftPadding))
 					_, _ = c.stdoutWriter.Write(b)
 					c.output.Reset()
 				} else {
-					_, _ = io.Copy(c.stdoutWriter, c.stderr)
+					_, _ = io.Copy(c.stdoutWriter, c.stderrPiper)
 				}
 			} else {
-				_, _ = io.Copy(&c.output, c.stdout)
+				_, _ = io.Copy(&c.output, c.stdoutPiper)
 			}
 		}()
 	} else {
-		c.Stdout = os.Stdout
+		c.Cmd.Stdout = os.Stdout
 	}
 
-	if (c.onError != nil || c.leftPadding > 0) && c.stderr == nil {
+	if (c.onError != nil || c.leftPadding > 0) && c.stderrPiper == nil {
 		c.prepareStderrPipe()
 	}
 
-	if c.stderr != nil {
-		defer c.stderr.Close()
+	if c.stderrPiper != nil {
+		defer c.stderrPiper.Close()
 		c.wg.Add(1)
 		go func() {
 			defer c.wg.Done()
 			if c.stderrWriter != nil {
 				if c.stderrWriter == os.Stderr && c.leftPadding > 0 {
-					_, _ = io.Copy(&c.slurp, c.stderr)
+					_, _ = io.Copy(&c.slurp, c.stderrPiper)
 					b := []byte(leftPad(c.slurp.String(), c.leftPadding))
 					_, _ = c.stderrWriter.Write(b)
 					c.slurp.Reset()
 				} else {
-					_, _ = io.Copy(c.stderrWriter, c.stderr)
+					_, _ = io.Copy(c.stderrWriter, c.stderrPiper)
 				}
 			} else {
-				_, _ = io.Copy(&c.slurp, c.stderr)
+				_, _ = io.Copy(&c.slurp, c.stderrPiper)
 			}
 		}()
 	} else {
-		c.Stderr = os.Stderr
+		c.Cmd.Stderr = os.Stderr
 	}
 
 	if c.err = c.Cmd.Start(); c.err != nil {
@@ -308,7 +308,7 @@ func (c *calling) runNow() error {
 	// Darwin: launchctl can fail with a zero exit status,
 	// so check for emtpy stderr
 	if c.Path == "launchctl" {
-		slurpText, _ := ioutil.ReadAll(c.stderr)
+		slurpText, _ := ioutil.ReadAll(c.stderrPiper)
 		if len(slurpText) > 0 && !bytes.HasSuffix(slurpText, []byte("Operation now in progress\n")) {
 			c.err = fmt.Errorf("failed with stderr: %s, cmd: %q", slurpText, c.Path)
 			return c.err
@@ -338,7 +338,7 @@ func (c *calling) runNow() error {
 }
 
 func (c *calling) prepareStdoutPipe() {
-	c.stdout, c.err = c.Cmd.StdoutPipe()
+	c.stdoutPiper, c.err = c.Cmd.StdoutPipe()
 	if c.err != nil {
 		// Failed to connect pipe
 		c.err = fmt.Errorf("failed to connect stdout pipe: %v, cmd: %q", c.err, c.Path)
@@ -346,7 +346,7 @@ func (c *calling) prepareStdoutPipe() {
 }
 
 func (c *calling) prepareStderrPipe() {
-	c.stderr, c.err = c.Cmd.StderrPipe()
+	c.stderrPiper, c.err = c.Cmd.StderrPipe()
 	if c.err != nil {
 		// Failed to connect pipe
 		c.err = fmt.Errorf("failed to connect stderr pipe: %v, cmd: %q", c.err, c.Path)
