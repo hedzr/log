@@ -11,7 +11,7 @@ func toStringSimple(i interface{}) string {
 }
 
 // LeftPad inserts spaces at beginning of each line
-func LeftPad(s string, pad int) string { return LeftPad(s, pad) }
+func LeftPad(s string, pad int) string { return leftPad(s, pad) }
 
 func leftPad(s string, pad int) string {
 	if pad <= 0 {
