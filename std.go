@@ -9,27 +9,30 @@ import (
 
 // NewStdLogger return a stdlib `log` logger
 func NewStdLogger() Logger {
-	return &stdLogger{Level: InfoLevel}
+	return &stdLogger{Level: InfoLevel, skip: 1}
 }
 
 // NewStdLoggerWith return a stdlib `log` logger
 func NewStdLoggerWith(lvl Level) Logger {
-	return &stdLogger{Level: lvl}
+	return &stdLogger{Level: lvl, skip: 1}
 }
 
 // NewStdLoggerWithConfig return a stdlib `log` logger
 func NewStdLoggerWithConfig(config *LoggerConfig) Logger {
 	l, _ := ParseLevel(config.Level)
-	return &stdLogger{Level: l}
+	return &stdLogger{Level: l, skip: 1}
 }
 
 type stdLogger struct {
 	Level
+	skip int
 }
+
+const skipFrames = 2
 
 func (s *stdLogger) out(args ...interface{}) {
 	str := fmt.Sprint(args...)
-	_ = log.Output(2, str)
+	_ = log.Output(skipFrames+s.skip, str)
 }
 
 func (s *stdLogger) Trace(args ...interface{}) {
@@ -68,7 +71,7 @@ func (s *stdLogger) Fatal(args ...interface{}) {
 
 func (s *stdLogger) Panic(args ...interface{}) {
 	str := fmt.Sprint(args...)
-	_ = log.Output(2, str)
+	_ = log.Output(skipFrames+s.skip, str)
 	panic(str)
 }
 
@@ -78,12 +81,12 @@ func (s *stdLogger) Print(args ...interface{}) {
 
 func (s *stdLogger) Println(args ...interface{}) {
 	str := fmt.Sprintln(args...)
-	_ = log.Output(2, str)
+	_ = log.Output(skipFrames+s.skip, str)
 }
 
 func (s *stdLogger) outf(msg string, args ...interface{}) {
 	str := fmt.Sprintf(msg, args...)
-	_ = log.Output(2, str)
+	_ = log.Output(skipFrames+s.skip, str)
 }
 
 func (s *stdLogger) Tracef(msg string, args ...interface{}) {
@@ -122,7 +125,7 @@ func (s *stdLogger) Fatalf(msg string, args ...interface{}) {
 
 func (s *stdLogger) Panicf(msg string, args ...interface{}) {
 	str := fmt.Sprintf(msg, args...)
-	_ = log.Output(2, str)
+	_ = log.Output(skipFrames+s.skip, str)
 	panic(str)
 }
 
@@ -135,4 +138,4 @@ func (s *stdLogger) GetLevel() Level            { return s.Level }
 func (s *stdLogger) SetOutput(out io.Writer)    {}
 func (s *stdLogger) GetOutput() (out io.Writer) { return }
 func (s *stdLogger) Setup()                     {}
-func (s *stdLogger) AddSkip(skip int) Logger    { return s }
+func (s *stdLogger) AddSkip(skip int) Logger    { return &stdLogger{Level: s.Level, skip: s.skip + skip} }
