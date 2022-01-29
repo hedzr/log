@@ -45,11 +45,11 @@ func TestForDir(t *testing.T) {
 		dirName = "$HOME/.config"
 	}
 
-	err := dir.ForDir(dirName, func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
+	err := dir.ForDir(dirName, func(depth int, dirname string, fi os.FileInfo) (stop bool, err error) {
 		if fi.IsDir() {
-			t.Logf("  - dir: %v/[%v]", cwd, fi.Name())
+			t.Logf("  - dir: %v - [%v]", dirname, fi.Name())
 		} else {
-			t.Logf("  - file: %v/%v", cwd, fi.Name())
+			t.Logf("  - file: %v - %v", dirname, fi.Name())
 		}
 		return
 	})
@@ -67,14 +67,58 @@ func TestForDirMax(t *testing.T) {
 		dirName = "$HOME/.config"
 	}
 
-	err := dir.ForDirMax(dirName, 0, 2, func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
+	err := dir.ForDirMax(dirName, 0, 2, func(depth int, dirname string, fi os.FileInfo) (stop bool, err error) {
 		if fi.IsDir() {
-			t.Logf("  - dir: %v/[%v]", cwd, fi.Name())
+			t.Logf("  - dir: %v - [%v]", dirname, fi.Name())
 		} else {
-			t.Logf("  - file: %v/%v", cwd, fi.Name())
+			t.Logf("  - file: %v - %v", dirname, fi.Name())
 		}
 		return
 	})
+
+	if err != nil {
+		t.Errorf("wrong for ForDir(): %v", err)
+	}
+}
+
+//func TestWalk(t *testing.T) {
+//	dirName := "$HOME/.local"
+//	if !dir.FileExists(dirName) {
+//		dirName = "$HOME/.config"
+//	}
+//	err := filepath.Walk(os.ExpandEnv(dirName), func(path string, info fs.FileInfo, err error) error {
+//		if info == nil {
+//			t.Logf("  - file: %v - ERR: %v", path, err)
+//		} else {
+//			t.Logf("  - file: %v - %v - %v", path, info.Name(), err)
+//		}
+//		return err
+//	})
+//	if err != nil {
+//		t.Error(err)
+//	}
+//}
+
+func TestForFileMax(t *testing.T) {
+	// defer logex.CaptureLog(t).Release()
+
+	//dirName := "$HOME/.local"
+	//if !dir.FileExists(dirName) {
+	//	dirName = "$HOME/.config"
+	//}
+	dirName := "$HOME/.config"
+	if !dir.FileExists(dirName) {
+		dirName = "$HOME"
+	}
+
+	err := dir.ForFileMax(dirName, 0, 6, func(depth int, dirname string, fi os.FileInfo) (stop bool, err error) {
+		if fi.IsDir() {
+			t.Logf("  - dir: %v - [%v]", dirname, fi.Name())
+		} else {
+			t.Logf("  - file: %v - %v", dirname, fi.Name())
+		}
+		return
+	}, "*/1.x/*", "*/1.x", "*/2.c", "*/node_modules", "*/.git", "*/usr*", "*/share")
 
 	if err != nil {
 		t.Errorf("wrong for ForDir(): %v", err)

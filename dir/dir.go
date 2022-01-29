@@ -23,12 +23,12 @@ func GetExecutableDir() string {
 	// _ = ioutil.WriteFile("/tmp/11", []byte(strings.Join(os.Args,",")), 0644)
 	// fmt.Printf("os.Args[0] = %v\n", os.Args[0])
 
-	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	d, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 	// if err != nil {
 	// 	logrus.Fatal(err)
 	// }
-	// fmt.Println(dir)
-	return dir
+	// fmt.Println(d)
+	return d
 }
 
 // GetExecutablePath returns the executable file path
@@ -40,12 +40,12 @@ func GetExecutablePath() string {
 // GetCurrentDir returns the current workingFlag directory
 // it should be equal with os.Getenv("PWD")
 func GetCurrentDir() string {
-	dir, _ := os.Getwd()
+	d, _ := os.Getwd()
 	// if err != nil {
 	// 	logrus.Fatal(err)
 	// }
-	// fmt.Println(dir)
-	return dir
+	// fmt.Println(d)
+	return d
 }
 
 // IsDirectory tests whether `path` is a directory or not
@@ -181,34 +181,34 @@ func FileExists(filepath string) bool {
 }
 
 // EnsureDir checks and creates the directory.
-func EnsureDir(dir string) (err error) {
-	if len(dir) == 0 {
+func EnsureDir(d string) (err error) {
+	if len(d) == 0 {
 		return errors.New("empty directory")
 	}
-	if !FileExists(dir) {
-		err = os.MkdirAll(dir, 0755)
+	if !FileExists(d) {
+		err = os.MkdirAll(d, 0755)
 	}
 	return
 }
 
 // EnsureDirEnh checks and creates the directory, via sudo if necessary.
-func EnsureDirEnh(dir string) (err error) {
-	if len(dir) == 0 {
+func EnsureDirEnh(d string) (err error) {
+	if len(d) == 0 {
 		return errors.New("empty directory")
 	}
-	if !FileExists(dir) {
-		err = os.MkdirAll(dir, 0755)
+	if !FileExists(d) {
+		err = os.MkdirAll(d, 0755)
 		if e, ok := err.(*os.PathError); ok && e.Err == syscall.EACCES {
 			var u *user.User
 			u, err = user.Current()
-			if _, _, err = exec.Sudo("mkdir", "-p", dir); err == nil {
-				_, _, err = exec.Sudo("chown", u.Username+":", dir)
+			if _, _, err = exec.Sudo("mkdir", "-p", d); err == nil {
+				_, _, err = exec.Sudo("chown", u.Username+":", d)
 			}
 
-			//if _, _, err = exec.Sudo("mkdir", "-p", dir); err != nil {
-			//	logrus.Warnf("Failed to create directory %q, using default stderr. error is: %v", dir, err)
-			//} else if _, _, err = exec.Sudo("chown", u.Username+":", dir); err != nil {
-			//	logrus.Warnf("Failed to create directory %q, using default stderr. error is: %v", dir, err)
+			//if _, _, err = exec.Sudo("mkdir", "-p", d); err != nil {
+			//	logrus.Warnf("Failed to create directory %q, using default stderr. error is: %v", d, err)
+			//} else if _, _, err = exec.Sudo("chown", u.Username+":", d); err != nil {
+			//	logrus.Warnf("Failed to create directory %q, using default stderr. error is: %v", d, err)
 			//}
 		}
 	}
@@ -216,9 +216,9 @@ func EnsureDirEnh(dir string) (err error) {
 }
 
 // RemoveDirRecursive removes a directory and any children it contains.
-func RemoveDirRecursive(dir string) (err error) {
-	// RemoveContentsInDir(dir)
-	err = os.RemoveAll(dir)
+func RemoveDirRecursive(d string) (err error) {
+	// RemoveContentsInDir(d)
+	err = os.RemoveAll(d)
 	return
 }
 
@@ -354,13 +354,25 @@ func ForDirMax(
 	}
 
 	var dirs []os.FileInfo
-	dirs, err = ioutil.ReadDir(os.ExpandEnv(root))
+	rootDir := os.ExpandEnv(root)
+	dirs, err = ioutil.ReadDir(rootDir)
 	if err != nil {
 		// Logger.Fatalf("error in ForDirMax(): %v", err)
 		return
 	}
 
 	var stop bool
+
+	//files, err :=os.ReadDir(rootDir)
+	var fi os.FileInfo
+	fi, err = os.Stat(rootDir)
+	if err != nil {
+		return
+	}
+	if stop, err = cb(initialDepth, rootDir, fi); stop {
+		return
+	}
+
 	for _, f := range dirs {
 		//Logger.Printf("  - %v", f.Name())
 		if err != nil {
@@ -369,27 +381,20 @@ func ForDirMax(
 		}
 
 		if f.IsDir() && (maxDepth <= 0 || (maxDepth > 0 && initialDepth+1 < maxDepth)) {
-			e := false
-			dir := path.Join(root, f.Name())
-			for _, ptn := range excludes {
-				if IsWildMatch(dir, ptn) {
-					e = true
-					break
-				}
-			}
-			if e {
+			if forFileMatched(f, rootDir, excludes...) {
 				continue
 			}
 
-			if stop, err = cb(initialDepth, dir, f); stop {
+			d := path.Join(rootDir, f.Name())
+			if stop, err = cb(initialDepth, d, f); stop {
 				return
 			}
-			if err = ForDirMax(dir, initialDepth+1, maxDepth, cb); err != nil {
+
+			if err = ForDirMax(d, initialDepth+1, maxDepth, cb); err != nil {
 				log.NewStdLogger().Errorf("error in ForDirMax(): %v", err)
 			}
 		}
 	}
-
 	return
 }
 
@@ -417,6 +422,11 @@ func ForFile(
 //
 // maxDepth = -1: no limit.
 // initialDepth: 0 if no idea.
+//
+// Known issue:
+// can't walk at ~/.local/share/NuGet/v3-cache/1ca707a4d90792ce8e42453d4e350886a0fdaa4d:_api.nuget.org_v3_index.json.
+// workaround: use filepath.Walk
+//
 func ForFileMax(
 	root string,
 	initialDepth, maxDepth int,
@@ -427,8 +437,11 @@ func ForFileMax(
 		return
 	}
 
+	rootDir := os.ExpandEnv(root)
 	var dirs []os.FileInfo
-	dirs, err = ioutil.ReadDir(os.ExpandEnv(root))
+	dirs, err = ioutil.ReadDir(rootDir)
+	//var dirs []os.DirEntry
+	//dirs, err = os.ReadDir(rootDir)
 	if err != nil {
 		// Logger.Fatalf("error in ForFileMax(): %v", err)
 		return
@@ -442,20 +455,13 @@ func ForFileMax(
 			continue
 		}
 
-		if f.IsDir() && (maxDepth <= 0 || (maxDepth > 0 && initialDepth+1 < maxDepth)) {
-			e := false
-			dir := path.Join(root, f.Name())
-			for _, ptn := range excludes {
-				if IsWildMatch(dir, ptn) {
-					e = true
-					break
-				}
-			}
-			if e {
+		if f.IsDir() && (maxDepth <= 0 || (maxDepth > 0 && initialDepth < maxDepth)) {
+			if forFileMatched(f, rootDir, excludes...) {
 				continue
 			}
 
-			if err = ForFileMax(dir, initialDepth+1, maxDepth, cb); err != nil {
+			d := path.Join(rootDir, f.Name())
+			if err = ForFileMax(d, initialDepth+1, maxDepth, cb, excludes...); err != nil {
 				log.NewStdLogger().Errorf("error in ForFileMax(): %v", err)
 			}
 
@@ -463,25 +469,44 @@ func ForFileMax(
 		}
 
 		if !f.IsDir() {
-			e := false
-			fullName := path.Join(root, f.Name())
-			for _, ptn := range excludes {
-				if IsWildMatch(fullName, ptn) {
-					e = true
-					break
-				}
-			}
-			if e {
+			if forFileMatched(f, rootDir, excludes...) {
 				continue
 			}
 
 			// log.Infof(" - %s", f.Name())
-			if stop, err = cb(initialDepth, root, f); stop {
+			//fi, _ := f.Info()
+			if stop, err = cb(initialDepth, rootDir, f); stop {
 				return
 			}
 		}
 	}
 
+	return
+}
+
+func forDirMatched(f os.DirEntry, root string, excludes ...string) (matched bool) {
+	fullName := path.Join(root, f.Name())
+	for _, ptn := range excludes {
+		if IsWildMatch(fullName, ptn) {
+			matched = true
+			break
+		}
+	}
+	return
+}
+
+func forFileMatched(f os.FileInfo, root string, excludes ...string) (matched bool) {
+	fullName := path.Join(root, f.Name())
+	for _, ptn := range excludes {
+		//if matched, _ = filepath.Match(ptn, fullName); matched {
+		//	break
+		//}
+		if matched = IsWildMatch(fullName, ptn); matched {
+			break
+			//} else if matched = IsWildMatch(f.Name(), ptn); matched {
+			//	break
+		}
+	}
 	return
 }
 
