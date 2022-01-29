@@ -484,16 +484,16 @@ func ForFileMax(
 	return
 }
 
-func forDirMatched(f os.DirEntry, root string, excludes ...string) (matched bool) {
-	fullName := path.Join(root, f.Name())
-	for _, ptn := range excludes {
-		if IsWildMatch(fullName, ptn) {
-			matched = true
-			break
-		}
-	}
-	return
-}
+//func forDirMatched(f os.DirEntry, root string, excludes ...string) (matched bool) {
+//	fullName := path.Join(root, f.Name())
+//	for _, ptn := range excludes {
+//		if IsWildMatch(fullName, ptn) {
+//			matched = true
+//			break
+//		}
+//	}
+//	return
+//}
 
 func forFileMatched(f os.FileInfo, root string, excludes ...string) (matched bool) {
 	fullName := path.Join(root, f.Name())
