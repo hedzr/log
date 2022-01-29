@@ -25,6 +25,9 @@ func TestIsMatch(t *testing.T) {
 
 	output = IsWildMatch("acdcb", "a*c?b")
 	expectFalse(t, output)
+
+	output = IsWildMatch(".config/1.x/1", "*/1.x/*")
+	expectTrue(t, output)
 }
 
 func expectFalse(t *testing.T, text interface{}) {
