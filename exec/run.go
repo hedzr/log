@@ -166,6 +166,12 @@ func (c *calling) WithVerboseCommandLine(verbose bool) *calling {
 	return c
 }
 
+// WithQuietOnError do NOT print error internally
+func (c *calling) WithQuietOnError(quiet bool) *calling {
+	c.quiet = quiet
+	return c
+}
+
 type calling struct {
 	*exec.Cmd
 
@@ -435,5 +441,12 @@ func WithPadding(leftPadding int) Opt {
 func WithVerboseCommandLine(verbose bool) Opt {
 	return func(c *calling) {
 		c.WithVerboseCommandLine(verbose)
+	}
+}
+
+// WithQuietOnError do NOT print error internally
+func WithQuietOnError(quiet bool) Opt {
+	return func(c *calling) {
+		c.WithQuietOnError(quiet)
 	}
 }
