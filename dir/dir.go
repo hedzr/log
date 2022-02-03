@@ -381,20 +381,20 @@ func ForDirMax(
 		}
 
 		if f.IsDir() && (maxDepth <= 0 || (maxDepth > 0 && initialDepth+1 < maxDepth)) {
-			if forFileMatched(f, rootDir, excludes...) {
+			d := path.Join(root, f.Name())
+			if inExcludes(d, excludes...) {
 				continue
 			}
 
-			d := path.Join(rootDir, f.Name())
 			if stop, err = cb(initialDepth, d, f); stop {
 				return
 			}
-
 			if err = ForDirMax(d, initialDepth+1, maxDepth, cb); err != nil {
 				log.NewStdLogger().Errorf("error in ForDirMax(): %v", err)
 			}
 		}
 	}
+
 	return
 }
 
@@ -497,14 +497,18 @@ func ForFileMax(
 
 func forFileMatched(f os.FileInfo, root string, excludes ...string) (matched bool) {
 	fullName := path.Join(root, f.Name())
+	matched = inExcludes(fullName, excludes...)
+	//if matched, _ = filepath.Match(ptn, fullName); matched {
+	//	break
+	//}
+	return
+}
+
+func inExcludes(name string, excludes ...string) (yes bool) {
 	for _, ptn := range excludes {
-		//if matched, _ = filepath.Match(ptn, fullName); matched {
-		//	break
-		//}
-		if matched = IsWildMatch(fullName, ptn); matched {
+		if IsWildMatch(name, ptn) {
+			yes = true
 			break
-			//} else if matched = IsWildMatch(f.Name(), ptn); matched {
-			//	break
 		}
 	}
 	return
