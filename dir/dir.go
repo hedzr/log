@@ -353,8 +353,20 @@ func ForDirMax(
 		return
 	}
 
+	//rootDir := os.ExpandEnv(root)
+	rootDir := path.Clean(NormalizeDir(root))
+
+	return forDirMax(rootDir, initialDepth, maxDepth, cb, excludes...)
+}
+
+func forDirMax(
+	rootDir string,
+	initialDepth int,
+	maxDepth int,
+	cb func(depth int, dirname string, fi os.FileInfo) (stop bool, err error),
+	excludes ...string,
+) (err error) {
 	var dirs []os.FileInfo
-	rootDir := os.ExpandEnv(root)
 	dirs, err = ioutil.ReadDir(rootDir)
 	if err != nil {
 		// Logger.Fatalf("error in ForDirMax(): %v", err)
@@ -373,6 +385,19 @@ func ForDirMax(
 		return
 	}
 
+	stop, err = forDirMaxLoops(dirs, rootDir, initialDepth, maxDepth, cb, excludes...)
+	return
+}
+
+func forDirMaxLoops(
+	dirs []os.FileInfo,
+	rootDir string,
+	initialDepth int,
+	maxDepth int,
+	cb func(depth int, dirname string, fi os.FileInfo) (stop bool, err error),
+	excludes ...string,
+) (stop bool, err error) {
+
 	for _, f := range dirs {
 		//Logger.Printf("  - %v", f.Name())
 		if err != nil {
@@ -381,8 +406,8 @@ func ForDirMax(
 		}
 
 		if f.IsDir() && (maxDepth <= 0 || (maxDepth > 0 && initialDepth+1 < maxDepth)) {
-			d := path.Join(root, f.Name())
-			if inExcludes(d, excludes...) {
+			d := path.Join(rootDir, f.Name())
+			if forFileMatched(d, excludes...) {
 				continue
 			}
 
@@ -437,7 +462,18 @@ func ForFileMax(
 		return
 	}
 
-	rootDir := os.ExpandEnv(root)
+	//rootDir := os.ExpandEnv(root)
+	rootDir := path.Clean(NormalizeDir(root))
+
+	return forFileMax(rootDir, initialDepth, maxDepth, cb, excludes...)
+}
+
+func forFileMax(
+	rootDir string,
+	initialDepth, maxDepth int,
+	cb func(depth int, dirname string, fi os.FileInfo) (stop bool, err error),
+	excludes ...string,
+) (err error) {
 	var dirs []os.FileInfo
 	dirs, err = ioutil.ReadDir(rootDir)
 	//var dirs []os.DirEntry
@@ -456,11 +492,11 @@ func ForFileMax(
 		}
 
 		if f.IsDir() && (maxDepth <= 0 || (maxDepth > 0 && initialDepth < maxDepth)) {
-			if forFileMatched(f, rootDir, excludes...) {
+			d := path.Join(rootDir, f.Name())
+			if forFileMatched(d, excludes...) {
 				continue
 			}
 
-			d := path.Join(rootDir, f.Name())
 			if err = ForFileMax(d, initialDepth+1, maxDepth, cb, excludes...); err != nil {
 				log.NewStdLogger().Errorf("error in ForFileMax(): %v", err)
 			}
@@ -469,7 +505,8 @@ func ForFileMax(
 		}
 
 		if !f.IsDir() {
-			if forFileMatched(f, rootDir, excludes...) {
+			d := path.Join(rootDir, f.Name())
+			if forFileMatched(d, excludes...) {
 				continue
 			}
 
@@ -495,19 +532,18 @@ func ForFileMax(
 //	return
 //}
 
-func forFileMatched(f os.FileInfo, root string, excludes ...string) (matched bool) {
-	fullName := path.Join(root, f.Name())
-	matched = inExcludes(fullName, excludes...)
-	//if matched, _ = filepath.Match(ptn, fullName); matched {
-	//	break
-	//}
-	return
-}
+//func forFileMatched(f os.FileInfo, root string, excludes ...string) (matched bool) {
+//	fullName := path.Join(root, f.Name())
+//	matched = inExcludes(fullName, excludes...)
+//	//if matched, _ = filepath.Match(ptn, fullName); matched {
+//	//	break
+//	//}
+//	return
+//}
 
-func inExcludes(name string, excludes ...string) (yes bool) {
+func forFileMatched(name string, excludes ...string) (yes bool) {
 	for _, ptn := range excludes {
-		if IsWildMatch(name, ptn) {
-			yes = true
+		if yes = IsWildMatch(name, ptn); yes {
 			break
 		}
 	}
