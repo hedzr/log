@@ -145,6 +145,11 @@ func AsLogger(logger L) Logger {
 // SetLevel sets the logging level
 func SetLevel(l Level) { logger.SetLevel(l) }
 
+// Setup _
+func Setup() {
+	logger.Setup()
+}
+
 // GetLevel returns the current logging level
 func GetLevel() Level { return logger.GetLevel() }
 
