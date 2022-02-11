@@ -1,5 +1,6 @@
 package log
 
+// AsSystemdLogger _
 func AsSystemdLogger(l L) SystemdLogger {
 	return &asl{
 		L: l,

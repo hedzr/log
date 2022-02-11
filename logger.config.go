@@ -94,8 +94,10 @@ func NewLoggerConfigWith(enabled bool, backend, level string, opts ...Opt) *Logg
 	return lc
 }
 
+// Opt _
 type Opt func(lc *LoggerConfig)
 
+// WithTimestamp _
 func WithTimestamp(short bool, format ...string) Opt {
 	return func(lc *LoggerConfig) {
 		lc.ShortTimestamp = short
@@ -105,6 +107,7 @@ func WithTimestamp(short bool, format ...string) Opt {
 	}
 }
 
+// WithExtraSkip _
 func WithExtraSkip(extraSkip int) Opt {
 	return func(lc *LoggerConfig) {
 		lc.ExtraSkip = extraSkip
