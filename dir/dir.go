@@ -562,6 +562,7 @@ func forFileMatched(name string, excludes ...string) (yes bool) {
 //     }
 //
 // BEWARE DON'T miss the ending brakets for defer call.
+// NOTE that current directory would not be changed if chdir(dirname) failed,
 func PushDir(dirname string) (closer func()) {
 	savedDir := GetCurrentDir()
 	var err error
@@ -574,6 +575,23 @@ func PushDir(dirname string) (closer func()) {
 			_ = os.Chdir(savedDir)
 		}
 	}
+}
+
+// PushDirEx provides a shortcut to enter a folder and restore at
+// the end of your current function scope.
+//
+func PushDirEx(dirname string) (closer func(), err error) {
+	savedDir := GetCurrentDir()
+	if err = os.Chdir(dirname); err != nil {
+		//err = nil //ignore path err
+		return
+	}
+	closer = func() {
+		if err == nil {
+			_ = os.Chdir(savedDir)
+		}
+	}
+	return
 }
 
 // DeleteFile deletes a file if exists
