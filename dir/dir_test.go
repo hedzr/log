@@ -6,6 +6,7 @@ package dir_test
 
 import (
 	"github.com/hedzr/log/dir"
+	"gopkg.in/hedzr/errors.v2"
 	"os"
 	"path"
 	"testing"
@@ -54,7 +55,7 @@ func TestForDir(t *testing.T) {
 		return
 	})
 
-	if err != nil {
+	if err != nil && !errors.TypeIs(err, &os.PathError{}) {
 		t.Errorf("wrong for ForDir(): %v", err)
 	}
 }
