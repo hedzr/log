@@ -136,6 +136,6 @@ func (s *stdLogger) Printf(msg string, args ...interface{}) {
 func (s *stdLogger) SetLevel(lvl Level)         { s.Level = lvl }
 func (s *stdLogger) GetLevel() Level            { return s.Level }
 func (s *stdLogger) SetOutput(out io.Writer)    {}
-func (s *stdLogger) GetOutput() (out io.Writer) { return }
+func (s *stdLogger) GetOutput() (out io.Writer) { return log.Writer() }
 func (s *stdLogger) Setup()                     {}
 func (s *stdLogger) AddSkip(skip int) Logger    { return &stdLogger{Level: s.Level, skip: s.skip + skip} }
