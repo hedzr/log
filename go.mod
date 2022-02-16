@@ -6,4 +6,4 @@ go 1.13
 
 //replace gopkg.in/hedzr/errors.v2 => ../05.errors
 
-require gopkg.in/hedzr/errors.v2 v2.1.9
+require gopkg.in/hedzr/errors.v2 v2.2.0
