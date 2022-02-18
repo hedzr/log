@@ -5,7 +5,7 @@ package log
 
 import (
 	"io"
-	"os"
+	"log"
 )
 
-func (s *stdLogger) GetOutput() (out io.Writer) { return os.Stderr }
+func (s *stdLogger) GetOutput() (out io.Writer) { return log.Writer() }
