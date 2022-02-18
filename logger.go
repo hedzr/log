@@ -156,6 +156,9 @@ func GetLevel() Level { return logger.GetLevel() }
 // SetOutput setup the logging output device
 func SetOutput(w io.Writer) { logger.SetOutput(w) }
 
+// GetOutput return the logging output device
+func GetOutput() (w io.Writer) { return logger.GetOutput() }
+
 // SetLogger transfer an instance into log package-level value
 func SetLogger(l Logger) { l.SetLevel(logger.GetLevel()); logger = l }
 
