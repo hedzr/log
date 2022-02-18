@@ -394,11 +394,11 @@ func ForDirMax(root string, initialDepth, maxDepth int, cb func(depth int, cwd s
 			return
 		}
 		if err != nil {
-			log.NewStdLogger().Errorf("error in ForDirMax().cb: %v", err)
+			log.Errorf("error in ForDirMax().cb: %v", err)
 		} else if f.IsDir() && (maxDepth <= 0 || (maxDepth > 0 && initialDepth+1 < maxDepth)) {
 			dir := path.Join(root, f.Name())
 			if err = ForDirMax(dir, initialDepth+1, maxDepth, cb); err != nil {
-				log.NewStdLogger().Errorf("error in ForDirMax(): %v", err)
+				log.Errorf("error in ForDirMax(): %v", err)
 			}
 		}
 	}
@@ -445,11 +445,11 @@ func ForFileMax(root string, initialDepth, maxDepth int, cb func(depth int, cwd 
 	for _, f := range dirs {
 		//Logger.Printf("  - %v", f.Name())
 		if err != nil {
-			log.NewStdLogger().Errorf("error in ForFileMax().cb: %v", err)
+			log.Errorf("error in ForFileMax().cb: %v", err)
 		} else if f.IsDir() && (maxDepth <= 0 || (maxDepth > 0 && initialDepth+1 < maxDepth)) {
 			dir := path.Join(root, f.Name())
 			if err = ForFileMax(dir, initialDepth+1, maxDepth, cb); err != nil {
-				log.NewStdLogger().Errorf("error in ForFileMax(): %v", err)
+				log.Errorf("error in ForFileMax(): %v", err)
 			}
 		} else if !f.IsDir() {
 			// log.Infof(" - %s", f.Name())
