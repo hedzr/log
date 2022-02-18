@@ -153,8 +153,6 @@ func Setup() {
 // GetLevel returns the current logging level
 func GetLevel() Level { return logger.GetLevel() }
 
-var logger = NewStdLogger()
-
 // SetOutput setup the logging output device
 func SetOutput(w io.Writer) { logger.SetOutput(w) }
 
