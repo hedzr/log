@@ -7,18 +7,18 @@ import (
 	"os"
 )
 
-// NewStdLogger return a stdlib `log` logger
-func NewStdLogger() Logger {
+// newStdLogger return a stdlib `log` logger
+func newStdLogger() Logger {
 	return &stdLogger{Level: InfoLevel, skip: 1}
 }
 
-// NewStdLoggerWith return a stdlib `log` logger
-func NewStdLoggerWith(lvl Level) Logger {
+// newStdLoggerWith return a stdlib `log` logger
+func newStdLoggerWith(lvl Level) Logger {
 	return &stdLogger{Level: lvl, skip: 1}
 }
 
-// NewStdLoggerWithConfig return a stdlib `log` logger
-func NewStdLoggerWithConfig(config *LoggerConfig) Logger {
+// newStdLoggerWithConfig return a stdlib `log` logger
+func newStdLoggerWithConfig(config *LoggerConfig) Logger {
 	l, _ := ParseLevel(config.Level)
 	return &stdLogger{Level: l, skip: 1}
 }
@@ -28,7 +28,12 @@ type stdLogger struct {
 	skip int
 }
 
-const skipFrames = 2
+// extraSkipFramesFromLogPackage used for hedzr/log package functions:
+//    log.Printf, log.Infof, ...
+const extraSkipFramesFromLogPackage = 1
+const skipFrames = 2 + extraSkipFramesFromLogPackage
+
+func (s *stdLogger) AddSkip(skip int) Logger { return &stdLogger{Level: s.Level, skip: s.skip + skip} }
 
 func (s *stdLogger) out(args ...interface{}) {
 	str := fmt.Sprint(args...)
@@ -138,4 +143,3 @@ func (s *stdLogger) GetLevel() Level            { return s.Level }
 func (s *stdLogger) SetOutput(out io.Writer)    {}
 func (s *stdLogger) GetOutput() (out io.Writer) { return log.Writer() }
 func (s *stdLogger) Setup()                     {}
-func (s *stdLogger) AddSkip(skip int) Logger    { return &stdLogger{Level: s.Level, skip: s.skip + skip} }

@@ -5,31 +5,6 @@ import (
 	"testing"
 )
 
-func TestStdLogger(t *testing.T) {
-	log := NewStdLogger()
-	log.SetLevel(TraceLevel)
-	log.Tracef("trace")
-	log.Debugf("debug")
-	log.Infof("info")
-	log.Warnf("warn")
-	log.Errorf("error")
-	// log.Fatalf("")
-	l := AsL(log)
-	l.Trace("trace")
-	l.Debug("debug")
-	l.Info("info")
-	l.Warn("warn")
-	l.Error("error")
-
-	log = NewStdLoggerWith(TraceLevel)
-	log.Printf("")
-	log.SetLevel(InfoLevel)
-	_ = log.GetLevel()
-	log.Setup()
-	tf(log)
-	tp(log)
-}
-
 func TestNewLoggerConfig(t *testing.T) {
 	log := NewDummyLogger()
 	log.Tracef("")
