@@ -330,13 +330,13 @@ func (c *calling) runNow() error {
 		if ok {
 			// Command didn't exit with a zero exit status.
 			c.retCode = exitStatus
-			c.err = errors.New("%q failed with stderr:\n%v\n  ", c.Path, c.slurp.String()).Attach(c.err)
+			c.err = errors.New("%q failed with stderr:\n%v\n  ", c.Path, c.slurp.String()).WithErrors(c.err)
 			return c.err
 		}
 
 		// An error occurred and there is no exit status.
 		//return 0, output, fmt.Errorf("%q failed: %v |\n  stderr: %s", command, err.Error(), slurp)
-		c.err = errors.New("%q failed with stderr:\n%v\n  ", c.Path, c.slurp.String()).Attach(c.err)
+		c.err = errors.New("%q failed with stderr:\n%v\n  ", c.Path, c.slurp.String()).WithErrors(c.err)
 		return c.err
 	}
 
