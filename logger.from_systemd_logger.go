@@ -24,6 +24,10 @@ type toSystemdLogger struct {
 	old Logger
 }
 
+func (d *toSystemdLogger) With(key string, val interface{}) Logger {
+	return d
+}
+
 func (d *toSystemdLogger) Trace(args ...interface{}) {
 	if d.lvl >= TraceLevel {
 		_ = d.sl.Info(args...)

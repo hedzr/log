@@ -20,6 +20,8 @@ func NewDummyLoggerWithConfig(config *LoggerConfig) Logger {
 
 type dummyLogger struct{}
 
+func (d *dummyLogger) With(key string, val interface{}) Logger { return d }
+
 func (d *dummyLogger) Trace(args ...interface{}) {}
 func (d *dummyLogger) Debug(args ...interface{}) {}
 func (d *dummyLogger) Info(args ...interface{})  {}

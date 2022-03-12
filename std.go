@@ -9,23 +9,24 @@ import (
 
 // newStdLogger return a stdlib `log` logger
 func newStdLogger() Logger {
-	return &stdLogger{Level: InfoLevel, skip: 1}
+	return &stdLogger{Level: InfoLevel, skip: 1, fields: make(map[string]interface{})}
 }
 
 // newStdLoggerWith return a stdlib `log` logger
 func newStdLoggerWith(lvl Level) Logger {
-	return &stdLogger{Level: lvl, skip: 1}
+	return &stdLogger{Level: lvl, skip: 1, fields: make(map[string]interface{})}
 }
 
 // newStdLoggerWithConfig return a stdlib `log` logger
 func newStdLoggerWithConfig(config *LoggerConfig) Logger {
 	l, _ := ParseLevel(config.Level)
-	return &stdLogger{Level: l, skip: 1}
+	return &stdLogger{Level: l, skip: 1, fields: make(map[string]interface{})}
 }
 
 type stdLogger struct {
 	Level
-	skip int
+	skip   int
+	fields map[string]interface{}
 }
 
 // extraSkipFramesFromLogPackage used for hedzr/log package functions:
@@ -38,6 +39,11 @@ func (s *stdLogger) AddSkip(skip int) Logger { return &stdLogger{Level: s.Level,
 func (s *stdLogger) out(args ...interface{}) {
 	str := fmt.Sprint(args...)
 	_ = log.Output(skipFrames+s.skip, str)
+}
+
+func (s *stdLogger) With(key string, val interface{}) Logger {
+	s.fields[key] = val
+	return s
 }
 
 func (s *stdLogger) Trace(args ...interface{}) {

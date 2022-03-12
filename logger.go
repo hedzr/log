@@ -24,8 +24,14 @@ type (
 		Infof(format string, a ...interface{}) error
 	}
 
+	// SL provides a structural logging interface
+	SL interface {
+		With(key string, val interface{}) Logger
+	}
+
 	// L provides a basic logger interface
 	L interface {
+
 		// Trace prints all args to stdin if logging level is greater than TraceLevel
 		Trace(args ...interface{})
 		// Debug prints all args to stdin if logging level is greater than DebugLevel
@@ -50,6 +56,8 @@ type (
 
 	// LF provides a L logger interface and format prototypes (such as Debugf...)
 	LF interface {
+		SL
+
 		// Tracef prints the text to stdin if logging level is greater than TraceLevel
 		Tracef(msg string, args ...interface{})
 		// Debugf prints the text to stdin if logging level is greater than DebugLevel
