@@ -112,7 +112,7 @@ type (
 // InTesting detects whether is running under go test mode
 func InTesting() bool { return InTestingT(os.Args) }
 
-// InTestingT detects whether is running under go test mode
+// InTestingT detects whether is running under 'go test' mode
 func InTestingT(args []string) bool {
 	if !strings.HasSuffix(args[0], ".test") &&
 		!strings.Contains(args[0], "/T/___Test") {
