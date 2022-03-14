@@ -110,7 +110,64 @@ type (
 
 #### Package-level functions
 
-Panicf, Fatalf, Errorf, Warnf, Infof, Debugf, Tracef
+- Panicf, Fatalf, Errorf, Warnf, Infof, Debugf, Tracef
+- Panic, Fatal, Error, Warn, Info, Debug, Trace
+- Printf, Println
+
+Since v1.5.39, These functions can be stripped from binary 
+output file by using build tags `veryquiet`.
+
+For example app
+
+```go
+package main
+import "github.com/hedzr/log"
+func main() {
+	log.Print(1, 2, 99+99)  // the call will be stripped completely
+}
+```
+
+We build and run it and get the empty output:
+
+```bash
+$ go build -tags=veryquiet -o main .
+$ ./main
+# and nothing to print out
+```
+
+
+#### For Verbose Mode, Package-level functions
+
+Since v1.5.39, a couple of V-* functions can be used:
+
+- VPanicf, VFatalf, VErrorf, VWarnf, VInfof, VDebugf, VTracef
+- VPanic, VFatal, VError, VWarn, VInfo, VDebug, VTrace
+- VPrintf, VPrintln
+
+There are nothing to output when these functions are running, except
+the app was built with tag `verbose`.
+
+
+For example:
+
+```go
+package main
+import "github.com/hedzr/log"
+func main() {
+	log.VPrint(99+99)  // the call will be stripped completely
+}
+```
+
+```bash
+$ go build -o main .
+$ ,/main
+# nothing to display
+
+$ go build -tags=verbose -o main .
+$ ./main
+198
+```
+
 
 #### Dummy and Standard Logger
 
