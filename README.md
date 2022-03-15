@@ -127,7 +127,7 @@ func main() {
 }
 ```
 
-We build and run it and get the empty output:
+We build it with tag so that the logging calls are all striped off:
 
 ```bash
 $ go build -tags=veryquiet -o main .
