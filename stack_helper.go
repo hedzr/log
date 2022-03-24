@@ -13,9 +13,10 @@ func CalcStackFrames(skipFramesAtFirst int) (skipped int) {
 	callerInitOnce.Do(func() {
 		pcs := make([]uintptr, 2)
 		_ = runtime.Callers(0, pcs)
-		logPackage = "github.com/hedzr/log"
-		logrusPackage = "github.com/sirupsen/logrus"
-		knownPackages = append(knownPackages, "runtime", "reflect", logPackage, logrusPackage)
+		logPackage := "github.com/hedzr/log" // and logx, logex
+		logrusPackage := "github.com/sirupsen/logrus"
+		errorsPackage := "gopkg.in/hedzr/errors.v"
+		knownPackages = append(knownPackages, "runtime", "reflect", logPackage, logrusPackage, errorsPackage)
 		knownPathes = []string{"/usr/local/go/src/"}
 	})
 
@@ -37,10 +38,9 @@ func CalcStackFrames(skipFramesAtFirst int) (skipped int) {
 }
 
 var (
-	knownPackages             []string
-	knownPathes               []string
-	logPackage, logrusPackage string
-	callerInitOnce            sync.Once
+	knownPackages  []string
+	knownPathes    []string
+	callerInitOnce sync.Once
 )
 
 const (
