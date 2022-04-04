@@ -3,6 +3,6 @@
 
 // for go1.18+
 
-package deepcopy
+package log
 
 type Any = any
