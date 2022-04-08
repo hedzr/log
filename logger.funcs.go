@@ -1,6 +1,10 @@
-//+build !veryquiet
+//go:build !veryquiet
+// +build !veryquiet
 
 package log
+
+// VeryQuietEnabled identify whether `--tags=veryquiet` has been defined in go building
+var VeryQuietEnabled = false
 
 // Tracef prints the text to stdin if logging level is greater than TraceLevel
 func Tracef(msg string, args ...interface{}) {

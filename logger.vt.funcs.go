@@ -1,6 +1,10 @@
-//+build verbose
+//go:build verbose
+// +build verbose
 
 package log
+
+// VerboseEnabled identify whether `--tags=verbose` has been defined in go building
+var VerboseEnabled = true
 
 // VTracef prints the text to stdin if logging level is greater than TraceLevel
 func VTracef(msg string, args ...interface{}) {
