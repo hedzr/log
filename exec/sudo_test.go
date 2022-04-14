@@ -53,8 +53,8 @@ func TestAlone(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	//var errBuffer bytes.Buffer
-	//cmd.Stderr = &errBuffer
+	// var errBuffer bytes.Buffer
+	// cmd.Stderr = &errBuffer
 	stdout, err = cmd.StdoutPipe()
 	if err != nil {
 		t.Fatal(err)
@@ -69,11 +69,11 @@ func TestAlone(t *testing.T) {
 
 	err = cmd.Wait()
 	if err != nil {
-		//var sb bytes.Buffer
-		//in := bufio.NewScanner(stderr)
-		//for in.Scan() {
+		// var sb bytes.Buffer
+		// in := bufio.NewScanner(stderr)
+		// for in.Scan() {
 		//	sb.Write(in.Bytes())
-		//}
+		// }
 		t.Logf("cmd.Run() failed with %s\n%s", err, slurp)
 	}
 	out, _ := ioutil.ReadAll(stdout)

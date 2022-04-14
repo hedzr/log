@@ -12,7 +12,7 @@ func TestNewLoggerConfig(t *testing.T) {
 	log.Infof("")
 	log.Warnf("")
 	log.Errorf("")
-	//log.Fatalf("")
+	// log.Fatalf("")
 	log.Printf("")
 	log.SetLevel(InfoLevel)
 	_ = log.GetLevel()

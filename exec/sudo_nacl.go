@@ -1,4 +1,4 @@
-//+build nacl
+// +build nacl
 
 // Copyright © 2020 Hedzr Yeh.
 

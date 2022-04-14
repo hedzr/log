@@ -1,5 +1,5 @@
-//+build !plan9
-//+build !nacl
+// +build !plan9
+// +build !nacl
 
 // Copyright © 2020 Hedzr Yeh.
 

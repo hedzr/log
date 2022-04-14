@@ -73,7 +73,7 @@ func RunCommandFull(command string, readStdout bool, arguments ...string) (retCo
 
 	} else {
 		cmd.Stdout = os.Stdout
-		//cmd.Stderr = os.Stderr
+		// cmd.Stderr = os.Stderr
 	}
 
 	// Connect pipe to read Stderr
@@ -119,11 +119,11 @@ func RunCommandFull(command string, readStdout bool, arguments ...string) (retCo
 		}
 
 		// An error occurred and there is no exit status.
-		//return 0, output, fmt.Errorf("%q failed: %v |\n  stderr: %s", command, err.Error(), slurp)
+		// return 0, output, fmt.Errorf("%q failed: %v |\n  stderr: %s", command, err.Error(), slurp)
 		return 0, output.String(), slurp.String(), errors.New("%q failed with stderr:\n%v\n  ", command, slurp.String()).WithErrors(err)
 	}
 
-	//if readStdout {
+	// if readStdout {
 	//	var out []byte
 	//	out, err = ioutil.ReadAll(stdout)
 	//	if err != nil {
@@ -131,7 +131,7 @@ func RunCommandFull(command string, readStdout bool, arguments ...string) (retCo
 	//	} else if len(out) > 0 {
 	//		output = string(out)
 	//	}
-	//}
+	// }
 
 	return 0, output.String(), slurp.String(), nil
 }

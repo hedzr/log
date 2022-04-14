@@ -1,4 +1,4 @@
-//+build istio
+// +build istio
 
 package buildtags
 

@@ -19,8 +19,8 @@ import (
 //
 func TestIsDirectory(t *testing.T) {
 	t.Logf("osargs[0] = %v", os.Args[0])
-	//t.Logf("InTesting: %v", cmdr.InTesting())
-	//t.Logf("InDebugging: %v", cmdr.InDebugging())
+	// t.Logf("InTesting: %v", cmdr.InTesting())
+	// t.Logf("InDebugging: %v", cmdr.InDebugging())
 
 	dir.NormalizeDir("")
 
@@ -82,7 +82,7 @@ func TestForDirMax(t *testing.T) {
 	}
 }
 
-//func TestWalk(t *testing.T) {
+// func TestWalk(t *testing.T) {
 //	dirName := "$HOME/.local"
 //	if !dir.FileExists(dirName) {
 //		dirName = "$HOME/.config"
@@ -98,15 +98,15 @@ func TestForDirMax(t *testing.T) {
 //	if err != nil {
 //		t.Error(err)
 //	}
-//}
+// }
 
 func TestForFileMax(t *testing.T) {
 	// defer logex.CaptureLog(t).Release()
 
-	//dirName := "$HOME/.local"
-	//if !dir.FileExists(dirName) {
+	// dirName := "$HOME/.local"
+	// if !dir.FileExists(dirName) {
 	//	dirName = "$HOME/.config"
-	//}
+	// }
 	dirName := "$HOME/.config"
 	if !dir.FileExists(dirName) {
 		dirName = "$HOME"
@@ -144,41 +144,41 @@ func TestGetExecutableDir(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	dir.FileModeIs(fn, dir.IsModeIrregular)
-	dir.FileModeIs(fn, dir.IsModeRegular)
-	dir.FileModeIs(fn, dir.IsModeDirectory)
-	dir.FileModeIs("/etc", dir.IsModeDirectory)
-	dir.FileModeIs("/etc", dir.IsModeIrregular)
-	dir.FileModeIs("/etc/not-existence", dir.IsModeIrregular)
+	_ = dir.FileModeIs(fn, dir.IsModeIrregular)
+	_ = dir.FileModeIs(fn, dir.IsModeRegular)
+	_ = dir.FileModeIs(fn, dir.IsModeDirectory)
+	_ = dir.FileModeIs("/etc", dir.IsModeDirectory)
+	_ = dir.FileModeIs("/etc", dir.IsModeIrregular)
+	_ = dir.FileModeIs("/etc/not-existence", dir.IsModeIrregular)
 
-	dir.IsModeExecOwner(fileInfo.Mode())
-	dir.IsModeExecGroup(fileInfo.Mode())
-	dir.IsModeExecOther(fileInfo.Mode())
-	dir.IsModeExecAny(fileInfo.Mode())
-	dir.IsModeExecAll(fileInfo.Mode())
+	_ = dir.IsModeExecOwner(fileInfo.Mode())
+	_ = dir.IsModeExecGroup(fileInfo.Mode())
+	_ = dir.IsModeExecOther(fileInfo.Mode())
+	_ = dir.IsModeExecAny(fileInfo.Mode())
+	_ = dir.IsModeExecAll(fileInfo.Mode())
 
-	dir.IsModeWriteOwner(fileInfo.Mode())
-	dir.IsModeWriteGroup(fileInfo.Mode())
-	dir.IsModeWriteOther(fileInfo.Mode())
-	dir.IsModeWriteAny(fileInfo.Mode())
-	dir.IsModeWriteAll(fileInfo.Mode())
+	_ = dir.IsModeWriteOwner(fileInfo.Mode())
+	_ = dir.IsModeWriteGroup(fileInfo.Mode())
+	_ = dir.IsModeWriteOther(fileInfo.Mode())
+	_ = dir.IsModeWriteAny(fileInfo.Mode())
+	_ = dir.IsModeWriteAll(fileInfo.Mode())
 
-	dir.IsModeReadOwner(fileInfo.Mode())
-	dir.IsModeReadGroup(fileInfo.Mode())
-	dir.IsModeReadOther(fileInfo.Mode())
-	dir.IsModeReadAny(fileInfo.Mode())
-	dir.IsModeReadAll(fileInfo.Mode())
+	_ = dir.IsModeReadOwner(fileInfo.Mode())
+	_ = dir.IsModeReadGroup(fileInfo.Mode())
+	_ = dir.IsModeReadOther(fileInfo.Mode())
+	_ = dir.IsModeReadAny(fileInfo.Mode())
+	_ = dir.IsModeReadAll(fileInfo.Mode())
 
-	dir.IsModeDirectory(fileInfo.Mode())
-	dir.IsModeSymbolicLink(fileInfo.Mode())
-	dir.IsModeDevice(fileInfo.Mode())
-	dir.IsModeNamedPipe(fileInfo.Mode())
-	dir.IsModeSocket(fileInfo.Mode())
-	dir.IsModeSetuid(fileInfo.Mode())
-	dir.IsModeSetgid(fileInfo.Mode())
-	dir.IsModeCharDevice(fileInfo.Mode())
-	dir.IsModeSticky(fileInfo.Mode())
-	dir.IsModeIrregular(fileInfo.Mode())
+	_ = dir.IsModeDirectory(fileInfo.Mode())
+	_ = dir.IsModeSymbolicLink(fileInfo.Mode())
+	_ = dir.IsModeDevice(fileInfo.Mode())
+	_ = dir.IsModeNamedPipe(fileInfo.Mode())
+	_ = dir.IsModeSocket(fileInfo.Mode())
+	_ = dir.IsModeSetuid(fileInfo.Mode())
+	_ = dir.IsModeSetgid(fileInfo.Mode())
+	_ = dir.IsModeCharDevice(fileInfo.Mode())
+	_ = dir.IsModeSticky(fileInfo.Mode())
+	_ = dir.IsModeIrregular(fileInfo.Mode())
 }
 
 func TestEnsureDir(t *testing.T) {

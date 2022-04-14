@@ -1,4 +1,4 @@
-//+build plan9
+// +build plan9
 
 // Copyright © 2020 Hedzr Yeh.
 

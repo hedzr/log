@@ -37,22 +37,22 @@ func TestLevels(t *testing.T) {
 func TestLog(t *testing.T) {
 	_ = NewLoggerConfig()
 
-	//var rootCmdX = &RootCommand{
+	// var rootCmdX = &RootCommand{
 	//	Command: Command{
 	//		BaseOpt: BaseOpt{
 	//			Name: "consul-tags",
 	//		},
 	//	},
-	//}
+	// }
 	//
-	//for _, x := range []string{"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "PANIC", "OFF", "XX"} {
+	// for _, x := range []string{"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "PANIC", "OFF", "XX"} {
 	//	Set("logger.level", x)
 	//	_ = internalGetWorker().getWithLogexInitializor(DebugLevel)(&rootCmdX.Command, []string{})
-	//}
+	// }
 	//
-	//Set("logger.target", "journal")
-	//Set("logger.format", "json")
-	//_ = internalGetWorker().getWithLogexInitializor(DebugLevel)(&rootCmdX.Command, []string{})
+	// Set("logger.target", "journal")
+	// Set("logger.format", "json")
+	// _ = internalGetWorker().getWithLogexInitializor(DebugLevel)(&rootCmdX.Command, []string{})
 
 	Trace("11", 11)
 	Debug("11", 11)

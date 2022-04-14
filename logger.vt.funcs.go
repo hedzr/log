@@ -7,31 +7,37 @@ package log
 var VerboseEnabled = true
 
 // VTracef prints the text to stdin if logging level is greater than TraceLevel
+// It would be optimized to discard except `--tags=verbose` was been defined.
 func VTracef(msg string, args ...interface{}) {
 	logger.Tracef(msg, args...)
 }
 
 // VDebugf prints the text to stdin if logging level is greater than DebugLevel
+// It would be optimized to discard except `--tags=verbose` was been defined.
 func VDebugf(msg string, args ...interface{}) {
 	logger.Debugf(msg, args...)
 }
 
 // VInfof prints the text to stdin if logging level is greater than InfoLevel
+// It would be optimized to discard except `--tags=verbose` was been defined.
 func VInfof(msg string, args ...interface{}) {
 	logger.Infof(msg, args...)
 }
 
 // VWarnf prints the text to stderr
+// It would be optimized to discard except `--tags=verbose` was been defined.
 func VWarnf(msg string, args ...interface{}) {
 	logger.Warnf(msg, args...)
 }
 
 // VErrorf prints the text to stderr
+// It would be optimized to discard except `--tags=verbose` was been defined.
 func VErrorf(msg string, args ...interface{}) {
 	logger.Errorf(msg, args...)
 }
 
 // VFatalf is equivalent to Printf() followed by a call to os.Exit(1).
+// It would be optimized to discard except `--tags=verbose` was been defined.
 func VFatalf(msg string, args ...interface{}) {
 	if InTesting() {
 		logger.Panicf(msg, args)
@@ -40,17 +46,20 @@ func VFatalf(msg string, args ...interface{}) {
 }
 
 // VPanicf is equivalent to Printf() followed by a call to panic().
+// It would be optimized to discard except `--tags=verbose` was been defined.
 func VPanicf(msg string, args ...interface{}) {
 	logger.Panicf(msg, args...)
 }
 
 // VPrintf calls Output to print to the standard logger.
 // Arguments are handled in the manner of fmt.Printf.
+// It would be optimized to discard except `--tags=verbose` was been defined.
 func VPrintf(msg string, args ...interface{}) {
 	logger.Printf(msg, args...)
 }
 
 // VTrace prints all args to stdin if logging level is greater than TraceLevel
+// It would be optimized to discard except `--tags=verbose` was been defined.
 func VTrace(args ...interface{}) {
 	if l := AsL(logger); l != nil {
 		l.Trace(args...)
@@ -58,6 +67,7 @@ func VTrace(args ...interface{}) {
 }
 
 // VDebug prints all args to stdin if logging level is greater than DebugLevel
+// It would be optimized to discard except `--tags=verbose` was been defined.
 func VDebug(args ...interface{}) {
 	if l := AsL(logger); l != nil {
 		l.Debug(args...)
@@ -65,6 +75,7 @@ func VDebug(args ...interface{}) {
 }
 
 // VInfo prints all args to stdin if logging level is greater than InfoLevel
+// It would be optimized to discard except `--tags=verbose` was been defined.
 func VInfo(args ...interface{}) {
 	if l := AsL(logger); l != nil {
 		l.Info(args...)
@@ -72,6 +83,7 @@ func VInfo(args ...interface{}) {
 }
 
 // VWarn prints all args to stderr
+// It would be optimized to discard except `--tags=verbose` was been defined.
 func VWarn(args ...interface{}) {
 	if l := AsL(logger); l != nil {
 		l.Warn(args...)
@@ -79,6 +91,7 @@ func VWarn(args ...interface{}) {
 }
 
 // VError prints all args to stderr
+// It would be optimized to discard except `--tags=verbose` was been defined.
 func VError(args ...interface{}) {
 	if l := AsL(logger); l != nil {
 		l.Error(args...)
@@ -86,6 +99,7 @@ func VError(args ...interface{}) {
 }
 
 // VFatal is equivalent to Printf() followed by a call to os.Exit(1).
+// It would be optimized to discard except `--tags=verbose` was been defined.
 func VFatal(args ...interface{}) {
 	if l := AsL(logger); l != nil {
 		if InTesting() {
@@ -96,6 +110,7 @@ func VFatal(args ...interface{}) {
 }
 
 // VPanic is equivalent to Printf() followed by a call to panic().
+// It would be optimized to discard except `--tags=verbose` was been defined.
 func VPanic(args ...interface{}) {
 	if l := AsL(logger); l != nil {
 		l.Panic(args...)
@@ -104,6 +119,7 @@ func VPanic(args ...interface{}) {
 
 // VPrint calls Output to print to the standard logger.
 // Arguments are handled in the manner of fmt.Print.
+// It would be optimized to discard except `--tags=verbose` was been defined.
 func VPrint(args ...interface{}) {
 	if l := AsL(logger); l != nil {
 		l.Print(args...)
@@ -112,6 +128,7 @@ func VPrint(args ...interface{}) {
 
 // VPrintln calls Output to print to the standard logger.
 // Arguments are handled in the manner of fmt.Println.
+// It would be optimized to discard except `--tags=verbose` was been defined.
 func VPrintln(args ...interface{}) {
 	if l := AsL(logger); l != nil {
 		l.Println(args...)

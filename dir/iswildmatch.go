@@ -100,7 +100,7 @@ func ToBool(val interface{}, defaultVal ...bool) (ret bool) {
 }
 
 func toBool(val string, defaultVal ...bool) (ret bool) {
-	//ret = ToBool(val, defaultVal...)
+	// ret = ToBool(val, defaultVal...)
 	switch strings.ToLower(val) {
 	case "1", "y", "t", "yes", "true", "ok", "on":
 		ret = true

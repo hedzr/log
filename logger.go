@@ -134,9 +134,9 @@ func InTestingT(args []string) bool {
 // AsL converts a logger to L type (with Info(...), ... prototypes)
 func AsL(logger LF) L {
 	if l, ok := logger.(L); ok {
-		//if l1, ok := l.(Logger); ok {
+		// if l1, ok := l.(Logger); ok {
 		//	return l1.AddSkip(1).(L)
-		//}
+		// }
 		return l
 	}
 	return nil
@@ -176,5 +176,5 @@ func GetLogger() Logger { return logger }
 // Skip ignore some extra caller frames
 func Skip(skip int) Logger {
 	return logger.AddSkip(skip)
-	//return logger
+	// return logger
 }

@@ -24,8 +24,8 @@ type issCtx struct {
 	isFile      bool
 	delayedOpts []func(c *issCtx) // not yet
 	expander    func(source string) string
-	//cmd        *Command
-	//args       []string
+	// cmd        *Command
+	// args       []string
 }
 
 type ISSOpt func(c *issCtx)
@@ -42,13 +42,13 @@ func WithScriptShell(knownShell string) ISSOpt {
 	}
 }
 
-//// WithCmdrEnviron provides the current command hit with its args.
-//// Its generally come from cmdr.Command.Action of a cmdr Command.
-//func WithCmdrEnviron(cmd *Command, args []string) ISSOpt {
+// // WithCmdrEnviron provides the current command hit with its args.
+// // Its generally come from cmdr.Command.Action of a cmdr Command.
+// func WithCmdrEnviron(cmd *Command, args []string) ISSOpt {
 //	return func(c *issCtx) {
 //		c.cmd, c.args = cmd, args
 //	}
-//}
+// }
 
 // WithScriptInvoker provides a custom runner to run the shell and scripts.
 //
@@ -120,11 +120,11 @@ func invokeShellScripts(scripts string, opts ...ISSOpt) (err error) {
 	}
 
 	var scriptFragments string
-	//if c.cmd != nil {
+	// if c.cmd != nil {
 	//	scriptFragments = internalGetWorker().expandTmplWithExecutiveEnv(scripts, c.cmd, c.args)
-	//} else {
+	// } else {
 	//	scriptFragments = scripts
-	//}
+	// }
 	if c.expander == nil {
 		c.expander = os.ExpandEnv
 	}
