@@ -114,8 +114,7 @@ type (
 - Panic, Fatal, Error, Warn, Info, Debug, Trace
 - Printf, Println
 
-Since v1.5.39, These functions can be stripped from binary 
-output file by using build tags `veryquiet`.
+Since v1.5.39, These functions can be stripped from binary output file by using build tags `veryquiet`.
 
 For example app
 
@@ -135,7 +134,6 @@ $ ./main
 # and nothing to print out
 ```
 
-
 #### For Verbose Mode, Package-level functions
 
 Since v1.5.39, a couple of V-* functions can be used:
@@ -144,9 +142,7 @@ Since v1.5.39, a couple of V-* functions can be used:
 - VPanic, VFatal, VError, VWarn, VInfo, VDebug, VTrace
 - VPrintf, VPrintln
 
-There are nothing to output when these functions are running, except
-the app was built with tag `verbose`.
-
+There are nothing to output when these functions are running, except the app was built with tag `verbose`.
 
 For example:
 
@@ -167,7 +163,6 @@ $ go build -tags=verbose -o main .
 $ ./main
 198
 ```
-
 
 #### Dummy and Standard Logger
 
@@ -230,7 +225,6 @@ func (s *Basic) Close() {
 ```
 
 And, `Basic` is a simple base type so that you can embed it.
-
 
 ### Directory Helper
 
@@ -321,8 +315,6 @@ func CopyFile(src, dst string) (err error)
 
 ```
 
-
-
 ### Exec Helpers
 
 #### Style 1
@@ -377,7 +369,6 @@ exec.New().
 
 ```
 
-
 ### Trace Helpers
 
 ```go
@@ -389,12 +380,6 @@ trace.IsEnable()
 trace.Start()
 trace.Stop()
 ```
-
-
-
-
-
-
 
 ## LICENSE
 
