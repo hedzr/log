@@ -209,12 +209,12 @@ func (c *calling) run() (err error) {
 
 	if c.onError != nil && err != nil {
 		c.onError(err, c.retCode, c.output.String(), c.slurp.String())
-		er = true
+		// er = true
 		return
 	}
 
 	if !c.quiet {
-		if c.output.Len() > 0 && ok == false {
+		if c.output.Len() > 0 && !ok {
 			if c.leftPadding > 0 {
 				fmt.Print(strings.Repeat(" ", c.leftPadding))
 			}
@@ -225,7 +225,7 @@ func (c *calling) run() (err error) {
 			}
 			_, _ = fmt.Fprintf(os.Stdout, "%v\n", leftPad(c.output.String(), c.leftPadding))
 		}
-		if c.slurp.Len() > 0 && er == false && c.retCode != 0 {
+		if c.slurp.Len() > 0 && !er && c.retCode != 0 {
 			if c.leftPadding > 0 {
 				_, _ = fmt.Fprintf(os.Stderr, "%v", strings.Repeat(" ", c.leftPadding))
 			}
@@ -335,7 +335,7 @@ func (c *calling) runNow() error {
 		}
 
 		// An error occurred and there is no exit status.
-		//return 0, output, fmt.Errorf("%q failed: %v |\n  stderr: %s", command, err.Error(), slurp)
+		// return 0, output, fmt.Errorf("%q failed: %v |\n  stderr: %s", command, err.Error(), slurp)
 		c.err = errors.New("%q failed with stderr:\n%v\n  ", c.Path, c.slurp.String()).WithErrors(c.err)
 		return c.err
 	}

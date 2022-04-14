@@ -22,8 +22,8 @@ func SetupCloseHandlerAndEnterLoop(closers ...basics.Peripheral) {
 // program if it receives an interrupt from the OS. We then handle this by calling
 // our clean up procedure and exiting the program.
 func setupCloseHandler(onFinish ...basics.Peripheral) chan struct{} {
-	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	c := make(chan os.Signal, 16)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM) //nolint:govet
 	done := make(chan struct{})
 	go func() {
 		<-c
@@ -32,14 +32,14 @@ func setupCloseHandler(onFinish ...basics.Peripheral) chan struct{} {
 			f.Close()
 		}
 		closers.Close()
-		//os.Exit(0)
+		// os.Exit(0)
 		close(done)
 	}()
 	return done
 }
 
 func enterLoop(done chan struct{}) {
-	for {
+	for { //nolint:gosimple
 		select {
 		case <-done:
 			return

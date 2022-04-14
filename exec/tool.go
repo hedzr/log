@@ -166,8 +166,7 @@ func SplitCommandString(s string, quoteChars ...rune) []string {
 	var qc rune = '"'
 	var m = map[rune]bool{qc: true}
 	for _, q := range quoteChars {
-		qc = q
-		m[q] = true
+		qc, m[q] = q, true //nolint:ineffassign
 	}
 
 	quoted, ch := false, rune(0)
@@ -188,5 +187,5 @@ func SplitCommandString(s string, quoteChars ...rune) []string {
 		b = append(b, trimQuotes(s))
 	}
 
-	return a
+	return b
 }
