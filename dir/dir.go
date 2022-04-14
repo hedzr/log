@@ -201,15 +201,17 @@ func EnsureDirEnh(d string) (err error) {
 		if e, ok := err.(*os.PathError); ok && e.Err == syscall.EACCES {
 			var u *user.User
 			u, err = user.Current()
-			if _, _, err = exec.Sudo("mkdir", "-p", d); err == nil {
-				_, _, err = exec.Sudo("chown", u.Username+":", d)
-			}
+			if err == nil {
+				if _, _, err = exec.Sudo("mkdir", "-p", d); err == nil {
+					_, _, err = exec.Sudo("chown", u.Username+":", d)
+				}
 
-			//if _, _, err = exec.Sudo("mkdir", "-p", d); err != nil {
-			//	logrus.Warnf("Failed to create directory %q, using default stderr. error is: %v", d, err)
-			//} else if _, _, err = exec.Sudo("chown", u.Username+":", d); err != nil {
-			//	logrus.Warnf("Failed to create directory %q, using default stderr. error is: %v", d, err)
-			//}
+				// if _, _, err = exec.Sudo("mkdir", "-p", d); err != nil {
+				//	logrus.Warnf("Failed to create directory %q, using default stderr. error is: %v", d, err)
+				// } else if _, _, err = exec.Sudo("chown", u.Username+":", d); err != nil {
+				//	logrus.Warnf("Failed to create directory %q, using default stderr. error is: %v", d, err)
+				// }
+			}
 		}
 	}
 	return
@@ -353,7 +355,7 @@ func ForDirMax(
 		return
 	}
 
-	//rootDir := os.ExpandEnv(root)
+	// rootDir := os.ExpandEnv(root)
 	rootDir := path.Clean(NormalizeDir(root))
 
 	return forDirMax(rootDir, initialDepth, maxDepth, cb, excludes...)
@@ -375,17 +377,17 @@ func forDirMax(
 
 	var stop bool
 
-	//files, err :=os.ReadDir(rootDir)
+	// files, err :=os.ReadDir(rootDir)
 	var fi os.FileInfo
 	fi, err = os.Stat(rootDir)
 	if err != nil {
 		return
 	}
-	if stop, err = cb(initialDepth, rootDir, fi); stop {
+	if stop, err = cb(initialDepth, rootDir, fi); stop { //nolint:ineffassign
 		return
 	}
 
-	stop, err = forDirMaxLoops(dirs, rootDir, initialDepth, maxDepth, cb, excludes...)
+	stop, err = forDirMaxLoops(dirs, rootDir, initialDepth, maxDepth, cb, excludes...) //nolint:ineffassign,staticcheck
 	return
 }
 
@@ -399,7 +401,7 @@ func forDirMaxLoops(
 ) (stop bool, err error) {
 
 	for _, f := range dirs {
-		//Logger.Printf("  - %v", f.Name())
+		// Logger.Printf("  - %v", f.Name())
 		if err != nil {
 			log.Errorf("error in ForDirMax().cb: %v", err)
 			continue
@@ -462,7 +464,7 @@ func ForFileMax(
 		return
 	}
 
-	//rootDir := os.ExpandEnv(root)
+	// rootDir := os.ExpandEnv(root)
 	rootDir := path.Clean(NormalizeDir(root))
 
 	return forFileMax(rootDir, initialDepth, maxDepth, cb, excludes...)
@@ -476,8 +478,8 @@ func forFileMax(
 ) (err error) {
 	var dirs []os.FileInfo
 	dirs, err = ioutil.ReadDir(rootDir)
-	//var dirs []os.DirEntry
-	//dirs, err = os.ReadDir(rootDir)
+	// var dirs []os.DirEntry
+	// dirs, err = os.ReadDir(rootDir)
 	if err != nil {
 		// Logger.Fatalf("error in ForFileMax(): %v", err)
 		return
@@ -485,7 +487,7 @@ func forFileMax(
 
 	var stop bool
 	for _, f := range dirs {
-		//Logger.Printf("  - %v", f.Name())
+		// Logger.Printf("  - %v", f.Name())
 		if err != nil {
 			log.Errorf("error in ForFileMax().cb: %v", err)
 			continue
@@ -511,7 +513,7 @@ func forFileMax(
 			}
 
 			// log.Infof(" - %s", f.Name())
-			//fi, _ := f.Info()
+			// fi, _ := f.Info()
 			if stop, err = cb(initialDepth, rootDir, f); stop {
 				return
 			}
@@ -521,7 +523,7 @@ func forFileMax(
 	return
 }
 
-//func forDirMatched(f os.DirEntry, root string, excludes ...string) (matched bool) {
+// func forDirMatched(f os.DirEntry, root string, excludes ...string) (matched bool) {
 //	fullName := path.Join(root, f.Name())
 //	for _, ptn := range excludes {
 //		if IsWildMatch(fullName, ptn) {
@@ -530,16 +532,16 @@ func forFileMax(
 //		}
 //	}
 //	return
-//}
+// }
 
-//func forFileMatched(f os.FileInfo, root string, excludes ...string) (matched bool) {
+// func forFileMatched(f os.FileInfo, root string, excludes ...string) (matched bool) {
 //	fullName := path.Join(root, f.Name())
 //	matched = inExcludes(fullName, excludes...)
 //	//if matched, _ = filepath.Match(ptn, fullName); matched {
 //	//	break
 //	//}
 //	return
-//}
+// }
 
 func forFileMatched(name string, excludes ...string) (yes bool) {
 	for _, ptn := range excludes {
@@ -567,7 +569,7 @@ func PushDir(dirname string) (closer func()) {
 	savedDir := GetCurrentDir()
 	var err error
 	if err = os.Chdir(dirname); err != nil {
-		//err = nil //ignore path err
+		// err = nil //ignore path err
 		return func() {}
 	}
 	return func() {
@@ -583,7 +585,7 @@ func PushDir(dirname string) (closer func()) {
 func PushDirEx(dirname string) (closer func(), err error) {
 	savedDir := GetCurrentDir()
 	if err = os.Chdir(dirname); err != nil {
-		//err = nil //ignore path err
+		// err = nil //ignore path err
 		return
 	}
 	closer = func() {

@@ -199,7 +199,7 @@ func IsModeReadOther(mode os.FileMode) bool { return mode&0004 != 0 }
 // Deprecated see also dir.IsModeReadAny
 func IsModeReadAny(mode os.FileMode) bool { return mode&0444 != 0 }
 
-// IsModeReadAll give the result of whether a file can be read by all users
+// IsModeReadAll give the result of whether a file can be read by all users.
 // Deprecated see also dir.IsModeReadAll
 func IsModeReadAll(mode os.FileMode) bool { return mode&0444 == 0444 }
 
@@ -239,15 +239,17 @@ func EnsureDirEnh(dir string) (err error) {
 		if e, ok := err.(*os.PathError); ok && e.Err == syscall.EACCES {
 			var u *user.User
 			u, err = user.Current()
-			if _, _, err = Sudo("mkdir", "-p", dir); err == nil {
-				_, _, err = Sudo("chown", u.Username+":", dir)
-			}
+			if err == nil {
+				if _, _, err = Sudo("mkdir", "-p", dir); err == nil {
+					_, _, err = Sudo("chown", u.Username+":", dir)
+				}
 
-			//if _, _, err = exec.Sudo("mkdir", "-p", dir); err != nil {
-			//	logrus.Warnf("Failed to create directory %q, using default stderr. error is: %v", dir, err)
-			//} else if _, _, err = exec.Sudo("chown", u.Username+":", dir); err != nil {
-			//	logrus.Warnf("Failed to create directory %q, using default stderr. error is: %v", dir, err)
-			//}
+				// if _, _, err = exec.Sudo("mkdir", "-p", dir); err != nil {
+				//	logrus.Warnf("Failed to create directory %q, using default stderr. error is: %v", dir, err)
+				// } else if _, _, err = exec.Sudo("chown", u.Username+":", dir); err != nil {
+				//	logrus.Warnf("Failed to create directory %q, using default stderr. error is: %v", dir, err)
+				// }
+			}
 		}
 	}
 	return
@@ -389,7 +391,7 @@ func ForDirMax(root string, initialDepth, maxDepth int, cb func(depth int, cwd s
 
 	var stop bool
 	for _, f := range dirs {
-		//Logger.Printf("  - %v", f.Name())
+		// Logger.Printf("  - %v", f.Name())
 		if stop, err = cb(initialDepth, root, f); stop {
 			return
 		}
@@ -443,7 +445,7 @@ func ForFileMax(root string, initialDepth, maxDepth int, cb func(depth int, cwd 
 
 	var stop bool
 	for _, f := range dirs {
-		//Logger.Printf("  - %v", f.Name())
+		// Logger.Printf("  - %v", f.Name())
 		if err != nil {
 			log.Errorf("error in ForFileMax().cb: %v", err)
 		} else if f.IsDir() && (maxDepth <= 0 || (maxDepth > 0 && initialDepth+1 < maxDepth)) {
