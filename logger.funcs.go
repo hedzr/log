@@ -40,7 +40,7 @@ func Errorf(msg string, args ...interface{}) {
 // It would be optimized to discard if `--tags=veryquiet` was been defined.
 func Fatalf(msg string, args ...interface{}) {
 	if InTesting() {
-		logger.Panicf(msg, args)
+		logger.Panicf(msg, args...)
 	}
 	logger.Fatalf(msg, args...)
 }
