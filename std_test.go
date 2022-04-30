@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestTopLevel(t *testing.T) {
+func TestStdLogger_atTopLevel(t *testing.T) {
 	Printf("hello")
 	Infof("hello info")
 	Warnf("hello warn")
@@ -15,7 +15,7 @@ func TestTopLevel(t *testing.T) {
 
 // TestNormal used logger directly so the caller is wrong.
 // To get the right filename and line number of caller, see also TestTopLevel
-func TestNormal(t *testing.T) {
+func TestStdLogger_Normal(t *testing.T) {
 	// config := log.NewLoggerConfigWith(true, "logrus", "trace")
 	// logger := logrus.NewWithConfig(config)
 	logger.Printf("hello")
@@ -41,8 +41,10 @@ func TestStdLogger(t *testing.T) {
 	l.Info("info")
 	l.Warn("warn")
 	l.Error("error")
+}
 
-	log = newStdLoggerWith(TraceLevel)
+func TestStdLogger_More(t *testing.T) {
+	log := newStdLoggerWith(TraceLevel)
 	log.Printf("")
 	log.SetLevel(InfoLevel)
 	_ = log.GetLevel()

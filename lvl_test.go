@@ -59,8 +59,10 @@ func TestLog(t *testing.T) {
 	Info("11", 11)
 	Warn("11", 11)
 	Error("11", 11)
+
 	tztf1() // Fatal("11", 11)
 	tztp1() // Panic("11", 11)
+
 	Print("11", 11)
 	Println("11", 11)
 
@@ -69,8 +71,10 @@ func TestLog(t *testing.T) {
 	Infof("t9.%v", 11)
 	Warnf("t9.%v", 11)
 	Errorf("t9.%v", 11)
+
 	tttf1() // Fatalf("t9.%v", 11)
 	tttp1() // Panicf("t9.%v", 11)
+
 	Printf("t9.%v", 11)
 
 	SetLogger(NewDummyLogger())
@@ -86,6 +90,8 @@ func TestLog(t *testing.T) {
 
 	SetDebugMode(true)
 	SetTraceMode(true)
+
+	SetLogger(newStdLogger())
 }
 
 func tztf1() {
