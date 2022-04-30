@@ -58,7 +58,7 @@ func (d *dummyLogger) Printf(msg string, args ...interface{}) {}
 func (d *dummyLogger) SetLevel(lvl Level)                     {}
 func (d *dummyLogger) GetLevel() Level                        { return InfoLevel }
 func (d *dummyLogger) SetOutput(out io.Writer)                {}
-func (d *dummyLogger) GetOutput() (out io.Writer)             { return }
+func (d *dummyLogger) GetOutput() (out io.Writer)             { return (&stdLogger{}).GetOutput() }
 func (d *dummyLogger) Setup()                                 {}
 func (d *dummyLogger) AddSkip(skip int) Logger                { return d }
 
