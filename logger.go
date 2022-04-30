@@ -7,6 +7,7 @@ package log
 
 import (
 	"io"
+	"log"
 	"os"
 	"strings"
 )
@@ -27,6 +28,7 @@ type (
 	// SL provides a structural logging interface
 	SL interface {
 		With(key string, val interface{}) Logger
+		WithFields(fields map[string]interface{}) Logger
 	}
 
 	// L provides a basic logger interface
@@ -168,7 +170,11 @@ func SetOutput(w io.Writer) { logger.SetOutput(w) }
 func GetOutput() (w io.Writer) { return logger.GetOutput() }
 
 // SetLogger transfer an instance into log package-level value
-func SetLogger(l Logger) { l.SetLevel(logger.GetLevel()); logger = l }
+func SetLogger(l Logger) {
+	l.SetLevel(logger.GetLevel())
+	logger = l
+	log.SetOutput(l.GetOutput())
+}
 
 // GetLogger returns the package-level logger globally
 func GetLogger() Logger { return logger }

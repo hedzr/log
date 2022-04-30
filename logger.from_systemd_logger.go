@@ -28,6 +28,10 @@ func (d *toSystemdLogger) With(key string, val interface{}) Logger {
 	return d
 }
 
+func (d *toSystemdLogger) WithFields(fields map[string]interface{}) Logger {
+	return d
+}
+
 func (d *toSystemdLogger) Trace(args ...interface{}) {
 	if d.lvl >= TraceLevel {
 		_ = d.sl.Info(args...)

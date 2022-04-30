@@ -46,6 +46,13 @@ func (s *stdLogger) With(key string, val interface{}) Logger {
 	return s
 }
 
+func (s *stdLogger) WithFields(fields map[string]interface{}) Logger {
+	for key, val := range fields {
+		s.fields[key] = val
+	}
+	return s
+}
+
 func (s *stdLogger) Trace(args ...interface{}) {
 	if s.Level >= TraceLevel {
 		s.out(args...)
