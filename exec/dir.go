@@ -28,7 +28,7 @@ func LookPath(file string) (string, error) {
 // GetExecutableDir returns the executable file directory
 // Deprecated see also dir.GetExecutableDir
 func GetExecutableDir() string {
-	// _ = ioutil.WriteFile("/tmp/11", []byte(strings.Join(os.Args,",")), 0644)
+	// _ = tool.WriteFile("/tmp/11", []byte(strings.Join(os.Args,",")), 0644)
 	// fmt.Printf("os.Args[0] = %v\n", os.Args[0])
 
 	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))

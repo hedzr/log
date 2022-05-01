@@ -2,7 +2,6 @@ package detects
 
 import (
 	"github.com/hedzr/log/dir"
-	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -29,7 +28,7 @@ func InIstio() bool {
 	if os.Getenv("KUBERNETES_SERVICE_HOST") != "" {
 		kf := "/etc/podinfo/labels"
 		if dir.FileExists(kf) {
-			if data, err := ioutil.ReadFile(kf); err == nil {
+			if data, err := dir.ReadFile(kf); err == nil {
 				// lines:=strings.Split(string(data),"\n")
 				if strings.Contains(string(data), "service.istio.io/canonical-name") {
 					return true
