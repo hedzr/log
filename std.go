@@ -18,7 +18,7 @@ func newStdLoggerWith(lvl Level) Logger {
 }
 
 // newStdLoggerWithConfig return a stdlib `log` logger
-func newStdLoggerWithConfig(config *LoggerConfig) Logger { //nolint:deadcode,unused
+func newStdLoggerWithConfig(config *LoggerConfig) Logger { //nolint:deadcode,unused //future code
 	l, _ := ParseLevel(config.Level)
 	return &stdLogger{Level: l, skip: 1, fields: make(map[string]interface{})}
 }
