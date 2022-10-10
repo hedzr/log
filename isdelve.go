@@ -29,10 +29,20 @@ func GetDebugMode() bool { return env.GetDebugMode() }
 func GetTraceMode() bool { return env.GetTraceMode() }
 
 // SetDebugMode set the debug boolean flag generally
-func SetDebugMode(b bool) { env.SetDebugMode(b) }
+func SetDebugMode(b bool) {
+	if b && GetLevel() < DebugLevel {
+		SetLevel(DebugLevel)
+	}
+	env.SetDebugMode(b)
+}
 
 // SetTraceMode set the trace boolean flag generally
-func SetTraceMode(b bool) { env.SetTraceMode(b) }
+func SetTraceMode(b bool) {
+	if b {
+		SetLevel(TraceLevel)
+	}
+	env.SetTraceMode(b)
+}
 
 // Env structure holds the debug/trace flags and provides CmdrMinimal accessors
 type Env struct {

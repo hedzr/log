@@ -6,27 +6,26 @@ import "strings"
 //
 // For examples:
 //
-//     output := IsWildMatch("aa", "aa")
-//     expectTrue(t, output)
+//	output := IsWildMatch("aa", "aa")
+//	expectTrue(t, output)
 //
-//     output = IsWildMatch("aaaa", "*")
-//     expectTrue(t, output)
+//	output = IsWildMatch("aaaa", "*")
+//	expectTrue(t, output)
 //
-//     output = IsWildMatch("ab", "a?")
-//     expectTrue(t, output)
+//	output = IsWildMatch("ab", "a?")
+//	expectTrue(t, output)
 //
-//     output = IsWildMatch("adceb", "*a*b")
-//     expectTrue(t, output)
+//	output = IsWildMatch("adceb", "*a*b")
+//	expectTrue(t, output)
 //
-//     output = IsWildMatch("aa", "a")
-//     expectFalse(t, output)
+//	output = IsWildMatch("aa", "a")
+//	expectFalse(t, output)
 //
-//     output = IsWildMatch("mississippi", "m??*ss*?i*pi")
-//     expectFalse(t, output)
+//	output = IsWildMatch("mississippi", "m??*ss*?i*pi")
+//	expectFalse(t, output)
 //
-//     output = IsWildMatch("acdcb", "a*c?b")
-//     expectFalse(t, output)
-//
+//	output = IsWildMatch("acdcb", "a*c?b")
+//	expectFalse(t, output)
 func IsWildMatch(s string, p string) bool {
 	runeInputArray := []rune(s)
 	runePatternArray := []rune(p)
@@ -91,7 +90,10 @@ func ToBool(val interface{}, defaultVal ...bool) (ret bool) {
 		return v != 0
 	}
 	if v, ok := val.(string); ok {
-		return toBool(v, defaultVal...)
+		var parsed bool
+		if ret, parsed = toBool(v, defaultVal...); parsed {
+			return
+		}
 	}
 	for _, vv := range defaultVal {
 		ret = vv
@@ -99,11 +101,36 @@ func ToBool(val interface{}, defaultVal ...bool) (ret bool) {
 	return
 }
 
-func toBool(val string, defaultVal ...bool) (ret bool) {
+// ToBoolEx translate a value to boolean
+func ToBoolEx(val interface{}, defaultVal ...bool) (ret, parsed bool) {
+	if ret, parsed = val.(bool); parsed {
+		return
+	}
+
+	switch v := val.(type) {
+	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
+		ret, parsed = v != 0, true
+		return
+	case string:
+		ret, parsed = toBool(v, defaultVal...)
+		if parsed {
+			return
+		}
+	}
+
+	for _, vv := range defaultVal {
+		ret = vv
+	}
+	return
+}
+
+func toBool(val string, defaultVal ...bool) (ret, parsed bool) {
 	// ret = ToBool(val, defaultVal...)
 	switch strings.ToLower(val) {
 	case "1", "y", "t", "yes", "true", "ok", "on":
-		ret = true
+		ret, parsed = true, true
+	case "0", "n", "f", "no", "false", "bad", "off":
+		ret, parsed = false, true
 	case "":
 		for _, vv := range defaultVal {
 			ret = vv
