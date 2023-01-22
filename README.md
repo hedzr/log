@@ -26,6 +26,12 @@
    8. **trace**: some tracing structure
    9. ...
 
+## History
+
+- v1.5.57
+  - fixed `GetExecutablePath()`.  
+    Old implements might return an invalid path string if a searchable executable is invoking from current directory.
+
 ## Common Interfaces for logging
 
 Here:
