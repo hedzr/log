@@ -31,7 +31,9 @@ func GetExecutableDir() string {
 	// _ = tool.WriteFile("/tmp/11", []byte(strings.Join(os.Args,",")), 0644)
 	// fmt.Printf("os.Args[0] = %v\n", os.Args[0])
 
-	dir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	p, _ := os.Executable()
+	p, _ = filepath.Abs(p)
+	dir, _ := filepath.Abs(filepath.Dir(p))
 	// if err != nil {
 	// 	logrus.Fatal(err)
 	// }
@@ -42,7 +44,8 @@ func GetExecutableDir() string {
 // GetExecutablePath returns the executable file path
 // Deprecated see also dir.GetExecutablePath
 func GetExecutablePath() string {
-	p, _ := filepath.Abs(os.Args[0])
+	p, _ := os.Executable()
+	p, _ = filepath.Abs(p)
 	return p
 }
 
@@ -80,8 +83,8 @@ func IsRegularFile(filepath string) (bool, error) {
 
 // FileModeIs tests the mode of 'filepath' with 'tester'. Examples:
 //
-//     var yes = exec.FileModeIs("/etc/passwd", exec.IsModeExecAny)
-//     var yes = exec.FileModeIs("/etc/passwd", exec.IsModeDirectory)
+//	var yes = exec.FileModeIs("/etc/passwd", exec.IsModeExecAny)
+//	var yes = exec.FileModeIs("/etc/passwd", exec.IsModeDirectory)
 //
 // Deprecated see also dir.FileModeIs
 func FileModeIs(filepath string, tester func(mode os.FileMode) bool) (ret bool) {
@@ -366,13 +369,13 @@ func ForDir(root string, cb func(depth int, cwd string, fi os.FileInfo) (stop bo
 //
 // Example - discover folder just one level
 //
-//      _ = ForDirMax(dir, 0, 1, func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
-//			if fi.IsDir() {
+//	     _ = ForDirMax(dir, 0, 1, func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
+//				if fi.IsDir() {
+//					return
+//				}
+//	         // ... doing something for a file,
 //				return
-//			}
-//          // ... doing something for a file,
-//			return
-//		})
+//			})
 //
 // maxDepth = -1: no limit.
 // initialDepth: 0 if no idea.
@@ -419,13 +422,13 @@ func ForFile(root string, cb func(depth int, cwd string, fi os.FileInfo) (stop b
 //
 // Example - discover folder just one level
 //
-//      _ = ForFileMax(dir, 0, 1, func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
-//			if fi.IsDir() {
+//	     _ = ForFileMax(dir, 0, 1, func(depth int, cwd string, fi os.FileInfo) (stop bool, err error) {
+//				if fi.IsDir() {
+//					return
+//				}
+//	         // ... doing something for a file,
 //				return
-//			}
-//          // ... doing something for a file,
-//			return
-//		})
+//			})
 //
 // maxDepth = -1: no limit.
 // initialDepth: 0 if no idea.

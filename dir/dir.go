@@ -23,7 +23,9 @@ func GetExecutableDir() string {
 	// _ = ioutil.WriteFile("/tmp/11", []byte(strings.Join(os.Args,",")), 0644)
 	// fmt.Printf("os.Args[0] = %v\n", os.Args[0])
 
-	d, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	p, _ := os.Executable()
+	p, _ = filepath.Abs(p)
+	d, _ := filepath.Abs(filepath.Dir(p))
 	// if err != nil {
 	// 	logrus.Fatal(err)
 	// }
@@ -33,7 +35,8 @@ func GetExecutableDir() string {
 
 // GetExecutablePath returns the executable file path
 func GetExecutablePath() string {
-	p, _ := filepath.Abs(os.Args[0])
+	p, _ := os.Executable()
+	p, _ = filepath.Abs(p)
 	return p
 }
 
