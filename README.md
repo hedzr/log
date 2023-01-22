@@ -19,12 +19,12 @@
 2. Most commonly helpers on:
    1. **basics and closers**: the basic infrastructures/peripherals with Open/Close interfaces
    2. **buildtags**: testers via buildtags: docker,k8s,istio
-   6. **detects**: testers in another way
+   3. **detects**: testers in another way
    4. **dir**: folder and files
    5. **exec**: make system call and sudo
-   7. **timing**: a timing and printing tool for runtime debugging
-   8. **trace**: some tracing structure
-   9. ...
+   6. **timing**: a timing and printing tool for runtime debugging
+   7. **trace**: some tracing structure
+   8. ...
 
 ## History
 
