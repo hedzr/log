@@ -30,7 +30,8 @@ type stdLogger struct {
 }
 
 // extraSkipFramesFromLogPackage used for hedzr/log package functions:
-//    log.Printf, log.Infof, ...
+//
+//	log.Printf, log.Infof, ...
 const extraSkipFramesFromLogPackage = 1
 const skipFrames = 2 + extraSkipFramesFromLogPackage
 
