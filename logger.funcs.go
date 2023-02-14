@@ -3,6 +3,8 @@
 
 package log
 
+import "fmt"
+
 // VeryQuietEnabled identify whether `--tags=veryquiet` has been defined in go building
 var VeryQuietEnabled = false
 
@@ -100,10 +102,36 @@ func Error(args ...interface{}) {
 
 // Fatal is equivalent to Printf() followed by a call to os.Exit(1).
 // It would be optimized to discard if `--tags=veryquiet` was been defined.
+//
+// If all args are nil, Fatal will return to caller normally.
 func Fatal(args ...interface{}) {
 	if l := AsL(logger); l != nil {
+		var has bool
+		var cnt int
+		var ent interface{}
+		for _, e := range args {
+			if e != nil {
+				has, ent = true, e
+				cnt++
+			}
+		}
+
+		if !has {
+			return
+		}
+
+		if cnt == 1 {
+			str := fmt.Sprintf("Error occurred: %+v", ent)
+			if InTesting() {
+				l.Panic(str)
+			} else {
+				l.Fatal(str)
+			}
+			return
+		}
+
 		if InTesting() {
-			l.Panic(args)
+			l.Panic(args...)
 		}
 		l.Fatal(args...)
 	}
@@ -111,8 +139,29 @@ func Fatal(args ...interface{}) {
 
 // Panic is equivalent to Printf() followed by a call to panic().
 // It would be optimized to discard if `--tags=veryquiet` was been defined.
+//
+// If all args are nil, Panic will return to caller normally.
 func Panic(args ...interface{}) {
 	if l := AsL(logger); l != nil {
+		var has bool
+		var cnt int
+		var ent interface{}
+		for _, e := range args {
+			if e != nil {
+				has, ent = true, e
+				cnt++
+			}
+		}
+
+		if !has {
+			return
+		}
+
+		if cnt == 1 {
+			l.Panic("Error occurred: %+v", ent)
+			return
+		}
+
 		l.Panic(args...)
 	}
 }
