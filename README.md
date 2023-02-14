@@ -28,6 +28,12 @@
 
 ## History
 
+- v1.6.1
+  - change `log.Fatal/Panic` facade to safely return to caller if no errors
+
+- v1.6.0
+  - upgrade deps  
+
 - v1.5.57
   - fixed `GetExecutablePath()`.  
     Old implements might return an invalid path string if a searchable executable is invoking from current directory.
