@@ -28,6 +28,10 @@
 
 ## History
 
+- v1.6.3
+  - improved detects package: added InDebugging(), ...
+  - better error format from errors.v3
+
 - v1.6.1
   - change `log.Fatal/Panic` facade to safely return to caller if no errors
 
