@@ -5,6 +5,8 @@ package log
 import (
 	"fmt"
 	"testing"
+
+	"github.com/hedzr/log/states"
 )
 
 func TestLevels(t *testing.T) {
@@ -82,14 +84,14 @@ func TestLog(t *testing.T) {
 	SetLevel(DebugLevel)
 	GetLevel()
 
-	if InDebugging() {
-		println(MinimalEnv())
+	if states.Env().InDebugging() {
+		println(states.Env())
 	}
 
-	println(MinimalEnv())
+	println(states.Env())
 
-	SetDebugMode(true)
-	SetTraceMode(true)
+	states.Env().SetDebugMode(true)
+	states.Env().SetTraceMode(true)
 
 	SetLogger(newStdLogger())
 }

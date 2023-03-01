@@ -28,6 +28,10 @@
 
 ## History
 
+- v1.6.5
+  - move debug/trace/verbose/... tests into states subpackage
+  - better error format from errors.v3
+
 - v1.6.3
   - improved detects package: added InDebugging(), ...
   - better error format from errors.v3
