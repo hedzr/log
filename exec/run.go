@@ -4,43 +4,43 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/hedzr/log"
-	"gopkg.in/hedzr/errors.v3"
 	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
 	"sync"
+
+	"gopkg.in/hedzr/errors.v3"
 )
 
 // New return a calling object to allow you to make the fluent call.
 //
 // Just like:
 //
-//     exec.New().WithCommand("bash", "-c", "echo hello world!").Run()
-//     err = exec.New().WithCommand("bash", "-c", "echo hello world!").RunAndCheckError()
+//	exec.New().WithCommand("bash", "-c", "echo hello world!").Run()
+//	err = exec.New().WithCommand("bash", "-c", "echo hello world!").RunAndCheckError()
 //
 // Processing the invoke result:
 //
-//     exec.New().
-//         WithCommand("bash", "-c", "echo hello world!").
-//         WithStdoutCaught().
-//         WithOnOK(func(retCode int, stdoutText string) { }).
-//         WithStderrCaught().
-//         WithOnError(func(err error, retCode int, stdoutText, stderrText string) { }).
-//         Run()
+//	exec.New().
+//	    WithCommand("bash", "-c", "echo hello world!").
+//	    WithStdoutCaught().
+//	    WithOnOK(func(retCode int, stdoutText string) { }).
+//	    WithStderrCaught().
+//	    WithOnError(func(err error, retCode int, stdoutText, stderrText string) { }).
+//	    Run()
 //
 // Use context:
 //
-//     exec.New().
-//         WithCommandString("bash -c 'echo hello world!'", '\'').
-//         WithContext(context.TODO()).
-//         Run()
-//     // or double quote pieces
-//     exec.New().
-//         WithCommandString("bash -c \"echo hello world!\"").
-//         Run()
+//	exec.New().
+//	    WithCommandString("bash -c 'echo hello world!'", '\'').
+//	    WithContext(context.TODO()).
+//	    Run()
+//	// or double quote pieces
+//	exec.New().
+//	    WithCommandString("bash -c \"echo hello world!\"").
+//	    Run()
 //
 // Auto Left-Padding if WithOnError / WithOnOK /
 // WithStderrCaught / WithStdoutCaught specified
@@ -48,12 +48,11 @@ import (
 // the handlers above. In this case, do it with
 // LeftPad manually).
 //
-//     args := []string{"-al", "/usr/local/bin"}
-//     err := exec.New().
-//         WithPadding(8).
-//         WithCommandArgs("ls", args...).
-//         RunAndCheckError()
-//
+//	args := []string{"-al", "/usr/local/bin"}
+//	err := exec.New().
+//	    WithPadding(8).
+//	    WithCommandArgs("ls", args...).
+//	    RunAndCheckError()
 func New(opts ...Opt) *calling {
 	c := &calling{}
 
@@ -155,7 +154,6 @@ func (c *calling) WithOnError(onError func(err error, retCode int, stdoutText, s
 // WithPadding apply left paddings to stdout/err if no
 // WithOnError / WithOnOK / WithStderrCaught / WithStdoutCaught
 // specified.
-//
 func (c *calling) WithPadding(leftPadding int) *calling {
 	c.leftPadding = leftPadding
 	return c
@@ -237,7 +235,7 @@ func (c *calling) run() (err error) {
 			_, _ = fmt.Fprintf(os.Stderr, "%v\n", leftPad(c.slurp.String(), c.leftPadding))
 		}
 		if err != nil {
-			log.Errorf("system call failed (command-line: %q): %v", c.Args, err)
+			err = errors.New("system call failed (command-line: %q): %v", c.Args, err)
 		}
 	}
 	return

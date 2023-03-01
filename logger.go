@@ -9,7 +9,8 @@ import (
 	"io"
 	"log"
 	"os"
-	"strings"
+
+	"github.com/hedzr/log/detects"
 )
 
 type (
@@ -112,26 +113,7 @@ type (
 )
 
 // InTesting detects whether is running under go test mode
-func InTesting() bool { return InTestingT(os.Args) }
-
-// InTestingT detects whether is running under 'go test' mode
-func InTestingT(args []string) bool {
-	if !strings.HasSuffix(args[0], ".test") &&
-		!strings.Contains(args[0], "/T/___Test") {
-
-		// [0] = /var/folders/td/2475l44j4n3dcjhqbmf3p5l40000gq/T/go-build328292371/b001/exe/main
-		// !strings.Contains(SavedOsArgs[0], "/T/go-build")
-
-		for _, s := range args {
-			if s == "-test.v" || s == "-test.run" {
-				return true
-			}
-		}
-		return false
-
-	}
-	return true
-}
+func InTesting() bool { return detects.InTestingT(os.Args) }
 
 // AsL converts a logger to L type (with Info(...), ... prototypes)
 func AsL(logger LF) L {

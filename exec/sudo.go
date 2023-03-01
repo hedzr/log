@@ -5,13 +5,14 @@ package exec
 import (
 	"bytes"
 	"fmt"
-	"gopkg.in/hedzr/errors.v3"
 	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"sync"
 	"syscall"
+
+	"gopkg.in/hedzr/errors.v3"
 )
 
 // Run runs an OS command

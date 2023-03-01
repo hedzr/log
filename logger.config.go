@@ -1,5 +1,9 @@
 package log
 
+import (
+	"github.com/hedzr/log/states"
+)
+
 type (
 	// LoggerConfig is used for creating a minimal logger with no more dependencies
 	LoggerConfig struct {
@@ -53,7 +57,7 @@ func NewLoggerConfig(opts ...Opt) *LoggerConfig {
 
 // NewLoggerConfigWith returns a default LoggerConfig
 func NewLoggerConfigWith(enabled bool, backend, level string, opts ...Opt) *LoggerConfig {
-	var dm, tm = GetDebugMode(), GetTraceMode()
+	var dm, tm = states.Env().GetDebugMode(), states.Env().GetTraceMode()
 	if dm {
 		level = "debug"
 	}
@@ -63,10 +67,10 @@ func NewLoggerConfigWith(enabled bool, backend, level string, opts ...Opt) *Logg
 
 	var l Level
 	l, _ = ParseLevel(level)
-	SetDebugMode(l >= DebugLevel)
-	SetTraceMode(l >= TraceLevel)
+	states.Env().SetDebugMode(l >= DebugLevel)
+	states.Env().SetTraceMode(l >= TraceLevel)
 
-	dm, tm = GetDebugMode(), GetTraceMode()
+	dm, tm = states.Env().GetDebugMode(), states.Env().GetTraceMode()
 
 	lc := &LoggerConfig{
 		Enabled:   enabled,

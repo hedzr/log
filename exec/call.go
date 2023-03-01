@@ -1,7 +1,8 @@
 package exec
 
 import (
-	"github.com/hedzr/log"
+	"gopkg.in/hedzr/errors.v3"
+
 	"strings"
 )
 
@@ -10,8 +11,8 @@ import (
 // DO NOT QUOTE: in 'cmd', A command line shouldn't has quoted parts.
 // These are bad:
 //
-//    cmd := "ls '/usr/bin'"
-//    cmd := `tar "c:/My Documents/"`
+//	cmd := "ls '/usr/bin'"
+//	cmd := `tar "c:/My Documents/"`
 //
 // Uses CallSlice if your args includes space (like 'c:/My Documents/')
 func Call(cmd string, fn func(retCode int, stdoutText string)) (err error) {
@@ -25,8 +26,8 @@ func Call(cmd string, fn func(retCode int, stdoutText string)) (err error) {
 // DO NOT QUOTE: in 'cmd', A command line shouldn't has quoted parts.
 // These are bad:
 //
-//    cmd := "ls '/usr/bin'"
-//    cmd := `tar "c:/My Documents/"`
+//	cmd := "ls '/usr/bin'"
+//	cmd := `tar "c:/My Documents/"`
 //
 // Uses CallSliceQuiet if your args includes space (like 'c:/My Documents/')
 func CallQuiet(cmd string, fn func(retCode int, stdoutText string)) (err error) {
@@ -36,14 +37,12 @@ func CallQuiet(cmd string, fn func(retCode int, stdoutText string)) (err error) 
 }
 
 // CallSlice executes the command line via system (OS).
-//
 func CallSlice(cmd []string, fn func(retCode int, stdoutText string)) (err error) {
 	err = internalCallImpl(cmd, fn, true)
 	return
 }
 
 // CallSliceQuiet executes the command line via system (OS) without error printing.
-//
 func CallSliceQuiet(cmd []string, fn func(retCode int, stdoutText string)) (err error) {
 	err = internalCallImpl(cmd, fn, false)
 	return
@@ -59,7 +58,7 @@ func internalCallImpl(cmd []string, fn func(retCode int, stdoutText string), aut
 	_, str, err = RunWithOutput(cmd[0], cmd[1:]...)
 	if err != nil {
 		if autoErrReport {
-			log.Errorf("Error on launching '%v': %v", cmd, err)
+			err = errors.New("Error on launching '%v': %v", cmd, err)
 		}
 		return
 	}

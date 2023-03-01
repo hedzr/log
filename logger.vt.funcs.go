@@ -4,7 +4,7 @@
 package log
 
 // VerboseEnabled identify whether `--tags=verbose` has been defined in go building
-var VerboseEnabled = true
+const VerboseEnabled = true
 
 // VTracef prints the text to stdin if logging level is greater than TraceLevel
 // It would be optimized to discard except `--tags=verbose` was been defined.

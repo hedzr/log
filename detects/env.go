@@ -4,9 +4,9 @@ package detects
 
 import (
 	"os"
+	"strings"
 
-	"github.com/hedzr/log"
-	"github.com/hedzr/log/trace"
+	"github.com/hedzr/log/states"
 )
 
 // InDebugging return the status if cmdr was built with debug mode / or the app running under a debugger attached.
@@ -26,7 +26,7 @@ import (
 //
 // noinspection GoBoolExpressions
 func InDebugging() bool {
-	return log.InDebugging() // isdelve.Enabled
+	return states.Env().InDebugging() // isdelve.Enabled
 }
 
 // IsDebuggerAttached return the status if cmdr was built with debug mode / or the app running under a debugger attached.
@@ -46,16 +46,35 @@ func InDebugging() bool {
 //
 // noinspection GoBoolExpressions
 func IsDebuggerAttached() bool {
-	return log.InDebugging() // isdelve.Enabled
+	return states.Env().InDebugging() // isdelve.Enabled
 }
 
 func InTracing() bool {
-	return trace.IsEnabled()
+	return states.Env().GetTraceMode()
+}
+
+// InTestingT detects whether is running under 'go test' mode
+func InTestingT(args []string) bool {
+	if !strings.HasSuffix(args[0], ".test") &&
+		!strings.Contains(args[0], "/T/___Test") {
+
+		// [0] = /var/folders/td/2475l44j4n3dcjhqbmf3p5l40000gq/T/go-build328292371/b001/exe/main
+		// !strings.Contains(SavedOsArgs[0], "/T/go-build")
+
+		for _, s := range args {
+			if s == "-test.v" || s == "-test.run" {
+				return true
+			}
+		}
+		return false
+
+	}
+	return true
 }
 
 // InTesting detects whether is running under go test mode
 func InTesting() bool {
-	return log.InTestingT(os.Args)
+	return InTestingT(os.Args)
 	// if !strings.HasSuffix(tool.SavedOsArgs[0], ".test") &&
 	//	!strings.Contains(tool.SavedOsArgs[0], "/T/___Test") {
 	//

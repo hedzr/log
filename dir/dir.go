@@ -3,10 +3,7 @@
 package dir
 
 import (
-	"errors"
 	"fmt"
-	"github.com/hedzr/log"
-	"github.com/hedzr/log/exec"
 	"io"
 	"io/ioutil"
 	"os"
@@ -16,6 +13,10 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"gopkg.in/hedzr/errors.v3"
+
+	"github.com/hedzr/log/exec"
 )
 
 // GetExecutableDir returns the executable file directory
@@ -75,9 +76,8 @@ func timeSpecToTime(ts syscall.Timespec) time.Time {
 
 // FileModeIs tests the mode of 'filepath' with 'tester'. Examples:
 //
-//     var yes = exec.FileModeIs("/etc/passwd", exec.IsModeExecAny)
-//     var yes = exec.FileModeIs("/etc/passwd", exec.IsModeDirectory)
-//
+//	var yes = exec.FileModeIs("/etc/passwd", exec.IsModeExecAny)
+//	var yes = exec.FileModeIs("/etc/passwd", exec.IsModeDirectory)
 func FileModeIs(filepath string, tester func(mode os.FileMode) bool) (ret bool) {
 	fileInfo, err := os.Stat(filepath)
 	if err != nil {
@@ -337,13 +337,13 @@ func ForDir(
 //
 // Example - discover folder just one level
 //
-//      _ = ForDirMax(dir, 0, 1, func(depth int, dirname string, fi os.FileInfo) (stop bool, err error) {
-//			if fi.IsDir() {
+//	     _ = ForDirMax(dir, 0, 1, func(depth int, dirname string, fi os.FileInfo) (stop bool, err error) {
+//				if fi.IsDir() {
+//					return
+//				}
+//	         // ... doing something for a file,
 //				return
-//			}
-//          // ... doing something for a file,
-//			return
-//		})
+//			})
 //
 // maxDepth = -1: no limit.
 // initialDepth: 0 if no idea.
@@ -402,11 +402,12 @@ func forDirMaxLoops(
 	cb func(depth int, dirname string, fi os.FileInfo) (stop bool, err error),
 	excludes ...string,
 ) (stop bool, err error) {
+	var ec = errors.New(`forDirMaxLoops have errors`)
+	defer ec.Defer(&err)
 
 	for _, f := range dirs {
 		// Logger.Printf("  - %v", f.Name())
 		if err != nil {
-			log.Errorf("error in ForDirMax().cb: %v", err)
 			continue
 		}
 
@@ -420,7 +421,7 @@ func forDirMaxLoops(
 				return
 			}
 			if err = ForDirMax(d, initialDepth+1, maxDepth, cb); err != nil {
-				log.Errorf("error in ForDirMax(): %v", err)
+				ec.Attach(err)
 			}
 		}
 	}
@@ -442,13 +443,13 @@ func ForFile(
 //
 // Example - discover folder just one level
 //
-//      _ = ForFileMax(dir, 0, 1, func(depth int, dirname string, fi os.FileInfo) (stop bool, err error) {
-//			if fi.IsDir() {
+//	     _ = ForFileMax(dir, 0, 1, func(depth int, dirname string, fi os.FileInfo) (stop bool, err error) {
+//				if fi.IsDir() {
+//					return
+//				}
+//	         // ... doing something for a file,
 //				return
-//			}
-//          // ... doing something for a file,
-//			return
-//		})
+//			})
 //
 // maxDepth = -1: no limit.
 // initialDepth: 0 if no idea.
@@ -456,7 +457,6 @@ func ForFile(
 // Known issue:
 // can't walk at ~/.local/share/NuGet/v3-cache/1ca707a4d90792ce8e42453d4e350886a0fdaa4d:_api.nuget.org_v3_index.json.
 // workaround: use filepath.Walk
-//
 func ForFileMax(
 	root string,
 	initialDepth, maxDepth int,
@@ -479,12 +479,16 @@ func forFileMax(
 	cb func(depth int, dirname string, fi os.FileInfo) (stop bool, err error),
 	excludes ...string,
 ) (err error) {
+	var ec = errors.New(`forFileMax have errors`)
+	defer ec.Defer(&err)
+
 	var dirs []os.FileInfo
 	dirs, err = ioutil.ReadDir(rootDir)
 	// var dirs []os.DirEntry
 	// dirs, err = os.ReadDir(rootDir)
 	if err != nil {
 		// Logger.Fatalf("error in ForFileMax(): %v", err)
+		ec.Attach(err)
 		return
 	}
 
@@ -492,7 +496,6 @@ func forFileMax(
 	for _, f := range dirs {
 		// Logger.Printf("  - %v", f.Name())
 		if err != nil {
-			log.Errorf("error in ForFileMax().cb: %v", err)
 			continue
 		}
 
@@ -503,7 +506,7 @@ func forFileMax(
 			}
 
 			if err = ForFileMax(d, initialDepth+1, maxDepth, cb, excludes...); err != nil {
-				log.Errorf("error in ForFileMax(): %v", err)
+				ec.Attach(err)
 			}
 
 			continue
@@ -561,10 +564,10 @@ func forFileMatched(name string, excludes ...string) (yes bool) {
 //
 // For example:
 //
-//     func TestSth() {
-//         defer dir.PushDir("/your/working/dir")()
-//         // do sth under '/your/working/dir' ...
-//     }
+//	func TestSth() {
+//	    defer dir.PushDir("/your/working/dir")()
+//	    // do sth under '/your/working/dir' ...
+//	}
 //
 // BEWARE DON'T miss the ending brakets for defer call.
 // NOTE that current directory would not be changed if chdir(dirname) failed,
@@ -584,7 +587,6 @@ func PushDir(dirname string) (closer func()) {
 
 // PushDirEx provides a shortcut to enter a folder and restore at
 // the end of your current function scope.
-//
 func PushDirEx(dirname string) (closer func(), err error) {
 	savedDir := GetCurrentDir()
 	if err = os.Chdir(dirname); err != nil {
