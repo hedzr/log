@@ -28,6 +28,9 @@
 
 ## History
 
+- v1.6.9
+  - added a func `exec.LookPath` deleted at earlier version
+
 - v1.6.7
   - upgrade to new errors.v3 | fix bugs and add new feature
 
