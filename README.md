@@ -28,6 +28,9 @@
 
 ## History
 
+- v1.6.7
+  - upgrade to new errors.v3 | fix bugs and add new feature
+
 - v1.6.5
   - move debug/trace/verbose/... tests into states subpackage
   - better error format from errors.v3
