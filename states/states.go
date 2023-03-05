@@ -8,32 +8,32 @@ import (
 
 // CmdrMinimal provides the accessors to debug/trace flags
 type CmdrMinimal interface {
-	InDebugging() bool
-	GetDebugMode() bool
-	SetDebugMode(b bool)
-	GetDebugLevel() int // return debug level as a integer, 0..n, it represents count of `--debug` or set by caller explicitly
-	SetDebugLevel(hits int)
+	InDebugging() bool      // is debug build
+	GetDebugMode() bool     // is debug build or the debug-mode flag is true, settable by `--debug`
+	SetDebugMode(b bool)    //
+	GetDebugLevel() int     // return debug level as a integer, 0..n, it represents count of `--debug` or set by caller explicitly
+	SetDebugLevel(hits int) //
 
-	GetTraceMode() bool
-	SetTraceMode(b bool)
-	GetTraceLevel() int // return trace level as a integer, 0..n, it represents count of `--trace` or set by caller explicitly
-	SetTraceLevel(hits int)
+	GetTraceMode() bool     //  the trace-mode flag, settable by `--trace`
+	SetTraceMode(b bool)    //
+	GetTraceLevel() int     // return trace level as a integer, 0..n, it represents count of `--trace` or set by caller explicitly
+	SetTraceLevel(hits int) //
 
-	IsNoColorMode() bool
-	SetNoColorMode(b bool)
-	CountOfNoColor() int
-	SetNoColorCount(hits int)
+	IsNoColorMode() bool      // settable by `--no-color`
+	SetNoColorMode(b bool)    //
+	CountOfNoColor() int      //
+	SetNoColorCount(hits int) //
 
-	IsVerboseMode() bool
-	IsVerboseModePure() bool
-	SetVerboseMode(b bool)
-	CountOfVerbose() int
-	SetVerboseCount(hits int)
+	IsVerboseMode() bool      // settable by `--verbose` or `-v`
+	IsVerboseModePure() bool  //
+	SetVerboseMode(b bool)    //
+	CountOfVerbose() int      //
+	SetVerboseCount(hits int) //
 
-	IsQuietMode() bool
-	SetQuietMode(b bool)
-	CountOfQuiet() int
-	SetQuietCount(hits int)
+	IsQuietMode() bool      // settable by `--quiet` or `-q`
+	SetQuietMode(b bool)    //
+	CountOfQuiet() int      //
+	SetQuietCount(hits int) //
 }
 
 func Env() CmdrMinimal { return env }
