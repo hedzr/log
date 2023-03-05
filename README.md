@@ -28,6 +28,10 @@
 
 ## History
 
+- v1.6.15
+  - more tests, docs
+  - unify detectors api entry to `detects` pkg, user can ignore `buildtags` and `states` in readonly accessing.
+
 - v1.6.9
   - added a func `exec.LookPath` deleted at earlier version
 
