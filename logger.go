@@ -8,9 +8,6 @@ package log
 import (
 	"io"
 	"log"
-	"os"
-
-	"github.com/hedzr/log/detects"
 )
 
 type (
@@ -111,9 +108,6 @@ type (
 	// BuilderFunc provides a function prototype for creating a hedzr/log & hedzr/logex -compliant creator.
 	BuilderFunc func(config *LoggerConfig) (logger Logger)
 )
-
-// InTesting detects whether is running under go test mode
-func InTesting() bool { return detects.InTestingT(os.Args) }
 
 // AsL converts a logger to L type (with Info(...), ... prototypes)
 func AsL(logger LF) L {
