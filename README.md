@@ -28,6 +28,9 @@
 
 ## History
 
+- v1.6.17
+  - updated top-level package functions: `log.InDebugging`, `InTracing`, `InTesting`, ...
+
 - v1.6.15
   - more tests, docs
   - unify detectors api entry to `detects` pkg, user can ignore `buildtags` and `states` in readonly accessing.
