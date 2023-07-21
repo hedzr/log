@@ -54,21 +54,21 @@ type minimalEnv struct {
 	quietCount   int
 }
 
-// InDebugging check if the delve debugger presents
+// InDebugging check if the delve debugger presents.
 func (e *minimalEnv) InDebugging() bool { return isdelve.Enabled }
 
-// GetDebugMode return the debug boolean flag generally
+// GetDebugMode return the debug boolean flag generally.
 func (e *minimalEnv) GetDebugMode() bool { return e.debugMode || isdelve.Enabled }
 
-// SetDebugMode set the debug boolean flag generally
+// SetDebugMode set the debug boolean flag generally.
 func (e *minimalEnv) SetDebugMode(b bool)    { e.debugMode = b }
 func (e *minimalEnv) GetDebugLevel() int     { return e.debugLevel }
 func (e *minimalEnv) SetDebugLevel(hits int) { e.debugLevel = hits }
 
-// GetTraceMode return the trace boolean flag generally
+// GetTraceMode return the trace boolean flag generally.
 func (e *minimalEnv) GetTraceMode() bool { return e.traceMode || trace.IsEnabled() }
 
-// SetTraceMode set the trace boolean flag generally
+// SetTraceMode set the trace boolean flag generally.
 func (e *minimalEnv) SetTraceMode(b bool)    { e.traceMode = b }
 func (e *minimalEnv) GetTraceLevel() int     { return e.traceLevel }
 func (e *minimalEnv) SetTraceLevel(hits int) { e.traceLevel = hits }
