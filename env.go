@@ -4,6 +4,7 @@ package log
 
 import (
 	"github.com/hedzr/log/detects"
+	"github.com/hedzr/log/states"
 )
 
 // InDebugging return the status if cmdr was built with debug mode / or the app running under a debugger attached.
@@ -65,3 +66,25 @@ func InDevelopingTime() (status bool) { return detects.InDevelopingTime() }
 //
 // InDockerEnvSimple finds if `/.dockerenv` exists or not.
 func InDockerEnvSimple() (status bool) { return detects.InDockerEnvSimple() }
+
+// GetDebugMode return the debug boolean flag generally.
+//
+//	GetDebugMode() = InDebugging() || internalStates.debugMode
+//	InDebugging()  = isdelve.Enabled
+func GetDebugMode() bool { return states.Env().GetDebugMode() }
+
+// SetDebugMode set the debug boolean flag generally
+func SetDebugMode(b bool) { states.Env().SetDebugMode(b) }
+
+func SetDebugLevel(hits int) { states.Env().SetDebugLevel(hits) }
+
+// GetTraceMode return the trace boolean flag generally.
+//
+//	GetTraceMode() = InTracing() || internalStates.traceMode
+//	InTracing()  = trace.IsEnabled()
+func GetTraceMode() bool { return states.Env().GetTraceMode() }
+
+// SetTraceMode set the trace boolean flag generally
+func SetTraceMode(b bool) { states.Env().SetTraceMode(b) }
+
+func SetTraceLevel(hits int) { states.Env().SetTraceLevel(hits) }
