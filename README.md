@@ -28,6 +28,9 @@
 
 ## History
 
+- v1.6.18
+  - upgrade deps
+
 - v1.6.17
   - updated top-level package functions: `log.InDebugging`, `InTracing`, `InTesting`, ...
 
