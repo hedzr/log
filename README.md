@@ -28,6 +28,12 @@
 
 ## History
 
+- v1.6.23
+  - upgrade deps
+
+- v1.6.21
+  - upgrade deps
+
 - v1.6.18
   - upgrade deps
 
