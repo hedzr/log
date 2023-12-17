@@ -1,2 +1,2 @@
-gopkg.in/hedzr/errors.v3 v3.1.11 h1:kF8Wf45EpQVDqdjZZt0E1p6NFhAB+6cT8eR3k5K6Jc8=
-gopkg.in/hedzr/errors.v3 v3.1.11/go.mod h1:UwtyepqtGTIAmdZGSc7wxXT5Gfd/BjcfRMhPpxwkJM4=
+gopkg.in/hedzr/errors.v3 v3.3.0 h1:yRrvjfAyMV5Sn4aMVJM0/aE1Xrm7IP637SENduQAKE4=
+gopkg.in/hedzr/errors.v3 v3.3.0/go.mod h1:UwtyepqtGTIAmdZGSc7wxXT5Gfd/BjcfRMhPpxwkJM4=
