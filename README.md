@@ -1,5 +1,6 @@
 # log
 
+**[TO BE ARCHIVED]**
 
 <!-- ![Build Status](https://travis-ci.org/hedzr/log.svg?branch=master)](https://travis-ci.org/hedzr/log) -->
 ![Go](https://github.com/hedzr/log/workflows/Go/badge.svg)
@@ -27,6 +28,9 @@
    8. ...
 
 ## History
+
+- v1.6.25
+  - upgrade deps
 
 - v1.6.23
   - upgrade deps
